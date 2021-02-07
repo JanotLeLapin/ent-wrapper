@@ -63,12 +63,54 @@ export default class Message {
                 resolve(parse ? htmlToText(json.body) : json.body);
             } catch (err) {
                 reject(err);
-                    }
-                });
+            }
+        });
     }
 
+    /**
+     * Replies to this message.
+     * @param subject The subject of the message
+     * @param body The body of the message
+     * @param to A list of users ids
+     * @param parseBody Wether the body should be parsed or not
+     * @param signature A custom signature
+     * @param attachments A list of attachments
+     * @param cc
+     * @param bcc
+     */
+    reply(subject: string, body: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                if (!this.session.authCookie) return;
+
+                const message = JSON.stringify({
+                    attachments: attachments ? attachments : [],
+                    bcc: bcc ? bcc : [],
+                    body: (parseBody ? body.split('\n').map(line => `<div class="ng-scope">${line}</div>`).join('') : body) + (signature ? `<div class="signature new-signature ng-scope">${signature}</div>` : ''),
+                    cc: cc ? cc : [],
+                    subject,
+                    to: [this.from],
+                });
+
+                const res = await fetch(baseUrl + 'zimbra/draft?In-Reply-To=' + this.id + '&reply=undefined', {
+                    headers: {
+                        'Cookie': this.session.authCookie,
+                    },
+                    method: 'POST',
+                    body: message,
+                });
                 const json = await res.json();
-                resolve(parse ? htmlToText(json.body) : json.body);
+                const id = json.id;
+
+                await fetch(baseUrl + 'zimbra/send?id=' + id + '&In-Reply-To=' + this.id, {
+                    headers: {
+                        'Cookie': this.session.authCookie,
+                    },
+                    method: 'POST',
+                    body: message,
+                });
+
+                resolve();
             } catch (err) {
                 reject(err);
             }
