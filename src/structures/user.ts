@@ -1,84 +1,63 @@
-import fetch from 'node-fetch';
-import https from 'https';
-
-import Message from './message';
-
-import { baseUrl } from '../util';
+import Session from './session';
 
 export default class User {
-    private authCookie?: string;
+    session: Session;
+
+    id: string;
+    login: string;
+    displayName: string;
+    type: string[];
+    schools: {
+        classes: string[];
+        name:    string;
+        id:      string;
+    }[];
+    motto: string;
+    mood: string;
+    health: string;
+    address: string;
+    email: string;
+    tel: string;
+    mobile: string;
+    birthdate: string;
+    hobbies: string;
+
+    constructor(data: any) {
+        this.session = data.session;
+
+        this.id = data.id;
+        this.login = data.login;
+        this.displayName = data.displayName;
+        this.type = data.type;
+        this.schools = data.schools;
+        this.motto = data.motto;
+        this.mood = data.mood;
+        this.health = data.health;
+        this.address = data.address;
+        this.email = data.email;
+        this.tel = data.tel;
+        this.mobile = data.mobile;
+        this.birthdate = data.birthdate;
+        this.hobbies = data.hobbies;
+    }
 
     /**
-     * Fetches a session cookie from the API.
-     * @param username Your ENT username (usually first name.last name)
-     * @param password Your ENT password
+     * Sends a message to this user.
+     * @param subject The subject of the message
+     * @param body The body of the message
+     * @param to A list of users ids
+     * @param parseBody Wether the body should be parsed or not
+     * @param signature A custom signature
+     * @param attachments A list of attachments
+     * @param cc
+     * @param bcc
      */
-    login(username: string, password: string): Promise<void> {
+    sendMessage(subject: string, body: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                const data = `email=${username}&password=${password}&callBack=https%253A%252F%252Fent.iledefrance.fr%252Ftimeline%252Ftimeline&details=`;
-                const req = https.request({
-                    hostname: 'ent.iledefrance.fr',
-                    path: '/auth/login',
-                    method: 'POST',
-                    headers: {
-                        'Accept': '*/*',
-                        'Accept-Encoding': 'gzip, deflate, br',
-                        'Accept-Language': 'en-US,en;q=0.9',
-                        'Cookie': 'webviewignored=true:1hPTD+eIINwwCLLaCxDmq1mvlTs=',
-                        'Connection': 'keep-alive',
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Content-Length': data.length,
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 OPR/73.0.3856.344',
-                    },
-                }, res => {
-                    this.authCookie = res.headers['set-cookie']?.map(cookie => cookie.split(';')[0]).join(';');
-                    res.destroy();
-                    resolve();
-                });
-                req.write(data);
-                req.end();
-            } catch (err) {
-                reject(err);
-            }
-        });
-    }
-
-    /**
-     * Fetches the user's preferred language.
-     */
-    fetchLanguage(): Promise<string> {
-        return new Promise<string>(async (resolve, reject) => {
-            try {
-                if (!this.authCookie) return reject();
-                const res = await fetch(baseUrl + 'userbook/preference/language', {
-                    headers: {
-                        'Cookie': this.authCookie,
-                    },
-                });
-                const json = await res.json();
-                resolve(JSON.parse(json.preference)['default-domain']);
-            } catch (err) {
-                reject(err);
-            }
-        });
-    }
-
-    /**
-     * Fetches a list of messages from the user's inbox.
-     * @param page The inbox page
-     */
-    fetchMessages(page: number): Promise<Message[]> {
-        return new Promise<Message[]>(async (resolve, reject) => {
-            try {
-                if (!this.authCookie) return reject();
-                const res = await fetch(baseUrl + 'zimbra/list?folder=Inbox&page=' + page + '&unread=false', {
-                    headers: {
-                        'Cookie': this.authCookie,
-                    },
-                });
-                const json: any[] = await res.json();
-                resolve(json.map(message => new Message({ ...message, authCookie: this.authCookie })));
+                if (!this.session.authCookie) return reject();
+                await this.session.sendMessage(subject, body, [this.id], parseBody, signature, attachments, cc, bcc);
+                resolve();
             } catch (err) {
                 reject(err);
             }
