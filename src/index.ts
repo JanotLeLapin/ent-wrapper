@@ -1,2 +1,7 @@
-export { default as User } from './structures/user';
-export { default as Message } from './structures/message';
+import User from './structures/user';
+import Message from './structures/user';
+
+export {
+    User,
+    Message,
+};
