@@ -1,10 +1,12 @@
 import fetch from 'node-fetch';
 import { htmlToText } from 'html-to-text';
 
+import Session from './session';
+
 import { baseUrl } from '../util';
 
 export default class Message {
-    authCookie: string;
+    session: Session;
 
     attachments: any[];
     bcc: any[];
@@ -24,7 +26,7 @@ export default class Message {
     unread: boolean;
 
     constructor(data: any) {
-        this.authCookie = data.authCookie;
+        this.session = data.session;
 
         this.attachments = data.attachments;
         this.bcc = data.bcc;
@@ -51,11 +53,20 @@ export default class Message {
     fetchBody(parse: boolean): Promise<string> {
         return new Promise<string>(async (resolve, reject) => {
             try {
+                if (!this.session.authCookie) return;
                 const res = await fetch(baseUrl + 'zimbra/message/' + this.id, {
                     headers: {
-                        'Cookie': this.authCookie,
+                        'Cookie': this.session.authCookie,
+                    },
+                });
+                const json = await res.json();
+                resolve(parse ? htmlToText(json.body) : json.body);
+            } catch (err) {
+                reject(err);
                     }
                 });
+    }
+
                 const json = await res.json();
                 resolve(parse ? htmlToText(json.body) : json.body);
             } catch (err) {
