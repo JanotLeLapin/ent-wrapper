@@ -9,7 +9,7 @@
     "license": "MIT",
     "scripts": {
         "start": "node dist",
-        "debug": "nodemon dist",
+        "debug": "nodemon dist/index.test.js",
         "clean": "rm -r dist"
     },
     "dependencies": {
