@@ -72,6 +72,9 @@ export default class Message {
         });
     }
 
+    /**
+     * Fetches the author of the message.
+     */
     fetchAuthor(): Promise<User> {
         return new Promise<User>(async (resolve, reject) => {
             try {
