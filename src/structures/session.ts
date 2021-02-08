@@ -95,7 +95,8 @@ export default class Session {
     login(username: string, password: string): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                const data = encodeUrl(`email=${username}&password=${password}&callBack=https%253A%252F%252Fent.iledefrance.fr%252Ftimeline%252Ftimeline&details=`);
+                const data = `email=${username}&password=${encodeUrl(password)}&callBack=https%253A%252F%252Fent.iledefrance.fr%252Ftimeline%252Ftimeline&details=`;
+                console.log(data);
                 const req = https.request({
                     hostname: 'ent.iledefrance.fr',
                     path: '/auth/login',
