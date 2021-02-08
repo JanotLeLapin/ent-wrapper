@@ -73,3 +73,15 @@ message.reply('Thank you', `The message you just sent, "${message.subject}", was
 
 session.sendMessage('Hello everyone', 'How are you guys doing?', ['user 1 id', 'user 2 id'], true, 'JanotLeLapin');
 ```
+
+### Deleting messages
+```ts
+// Fetch sent messages
+const messages = await session.fetchOutboxMessages(0);
+
+// Getting the latest message
+const message = messages[0];
+
+// Deleting the message
+await message.moveToTrash();
+```
