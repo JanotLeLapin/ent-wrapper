@@ -63,6 +63,9 @@ user.sendMessage('Hello', `Hey there ${user.displayName}, just wanted to let you
 
 // Or replying to a message
 
+// Fetching inbox messages
+const messages = await session.fetchInboxMessages(0);
+
 // Getting the latest message
 const message = messages[0];
 
