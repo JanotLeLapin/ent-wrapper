@@ -1,5 +1,13 @@
-# ent-wrapper
-A wrapper for the ent api written in TypeScript
+<div align="center">
+    <br/>
+    <p>
+        <h1>Ent Wrapper</h1>
+        <h3>A wrapper for the Ent api written in Typescript.</h3>
+    </p>
+    <p>
+        <a href="https://nodei.co/npm/ent-wrapper/"><img src="https://nodei.co/npm/ent-wrapper.png?downloads=true&stars=true" alt="npm installnfo" /></a>
+    </p>
+</div>
 
 ## Warning
 For now, this library has only been tested with the region ildedefrance. If your region does not work, feel free to open an issue.
