@@ -13,7 +13,7 @@ const run = async () => {
         const session = new Ent.Session();
 
         // Logging in
-        await user.login('firstname.lastname', 'password');
+        await user.login('ent.iledefrance.fr', 'firstname.lastname', 'password');
 
         // Fetching user informations
         const userInfo = await session.fetchCurrenthUserInfo();
@@ -47,6 +47,10 @@ const author = await message.fetchAuthor();
 
 // Logging the message
 console.log(`A message from ${author.displayName}:\n\nSubject: ${message.subject}\n${body}`);
+// A message from ARMEL Samuel:
+
+// Subject: Hello
+// Hey how are you
 ```
 
 ### Sending messages
