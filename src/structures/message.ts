@@ -88,7 +88,7 @@ export default class Message {
     }
 
     /**
-     * Replies to this message.
+     * Replies to this message and returns the reply's id.
      * @param subject The subject of the message
      * @param body The body of the message
      * @param to A list of users ids
@@ -98,8 +98,8 @@ export default class Message {
      * @param cc
      * @param bcc
      */
-    reply(subject: string, body: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
+    reply(subject: string, body: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<number> {
+        return new Promise<number>(async (resolve, reject) => {
             try {
                 if (!this.session.authCookie) return reject('Missing auth cookie.');
 
@@ -120,6 +120,7 @@ export default class Message {
                     body: message,
                 });
                 const json = await res.json();
+                if (error(json, reject)) return;
                 const id = json.id;
 
                 const sendRes = await fetch(this.session.url + 'zimbra/send?id=' + id + '&In-Reply-To=' + this.id, {
@@ -130,6 +131,14 @@ export default class Message {
                     body: message,
                 });
                 const sendJson = await sendRes.json();
+                if (error(sendJson, reject)) return;
+                resolve(sendJson.id);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
                 if (error(json, reject)) return;
                 resolve();
             } catch (err) {

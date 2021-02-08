@@ -214,7 +214,7 @@ export default class Session {
     }
 
     /**
-     * Sends a message to a list of ENT users.
+     * Sends a message to a list of ENT users and returns the message id.
      * @param subject The subject of the message
      * @param body The body of the message
      * @param to A list of users ids
@@ -224,8 +224,8 @@ export default class Session {
      * @param cc
      * @param bcc
      */
-    sendMessage(subject: string, body: string, to: string[], parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
+    sendMessage(subject: string, body: string, to: string[], parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<number> {
+        return new Promise<number>(async (resolve, reject) => {
             try {
                 if (!this.authCookie) return reject('Missing auth cookie.');
 
@@ -258,7 +258,7 @@ export default class Session {
                 });
                 const sendJson = await sendRes.json();
                 if (error(sendJson, reject)) return;
-                resolve();
+                resolve(sendJson.id);
             } catch (err) {
                 reject(err);
             }

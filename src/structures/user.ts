@@ -42,7 +42,7 @@ export default class User {
     }
 
     /**
-     * Sends a message to this user.
+     * Sends a message to this user and returns the message id.
      * @param subject The subject of the message
      * @param body The body of the message
      * @param to A list of users ids
@@ -52,12 +52,12 @@ export default class User {
      * @param cc
      * @param bcc
      */
-    sendMessage(subject: string, body: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
+    sendMessage(subject: string, body: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<number> {
+        return new Promise<number>(async (resolve, reject) => {
             try {
                 if (!this.session.authCookie) return reject('Missing auth cookie.');
-                await this.session.sendMessage(subject, body, [this.id], parseBody, signature, attachments, cc, bcc);
-                resolve();
+                const id = await this.session.sendMessage(subject, body, [this.id], parseBody, signature, attachments, cc, bcc);
+                resolve(id);
             } catch (err) {
                 reject(err);
             }
