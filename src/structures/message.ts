@@ -4,6 +4,8 @@ import { htmlToText } from 'html-to-text';
 import Session from './session';
 import User from './user';
 
+import { error } from '../util';
+
 export default class Message {
     session: Session;
 
@@ -52,13 +54,14 @@ export default class Message {
     fetchBody(parse: boolean): Promise<string> {
         return new Promise<string>(async (resolve, reject) => {
             try {
-                if (!this.session.authCookie) return;
+                if (!this.session.authCookie) return reject('Missing auth cookie.');
                 const res = await fetch(this.session.url + 'zimbra/message/' + this.id, {
                     headers: {
                         'Cookie': this.session.authCookie,
                     },
                 });
                 const json = await res.json();
+                if (error(json, reject)) return;
                 resolve(parse ? htmlToText(json.body) : json.body);
             } catch (err) {
                 reject(err);
@@ -69,7 +72,7 @@ export default class Message {
     fetchAuthor(): Promise<User> {
         return new Promise<User>(async (resolve, reject) => {
             try {
-                if (!this.session.authCookie) return;
+                if (!this.session.authCookie) return reject('Missing auth cookie.');
                 const user = await this.session.fetchUser(this.from);
                 resolve(user);
             } catch (err) {
@@ -92,7 +95,7 @@ export default class Message {
     reply(subject: string, body: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                if (!this.session.authCookie) return;
+                if (!this.session.authCookie) return reject('Missing auth cookie.');
 
                 const message = JSON.stringify({
                     attachments: attachments ? attachments : [],
@@ -113,14 +116,15 @@ export default class Message {
                 const json = await res.json();
                 const id = json.id;
 
-                await fetch(this.session.url + 'zimbra/send?id=' + id + '&In-Reply-To=' + this.id, {
+                const sendRes = await fetch(this.session.url + 'zimbra/send?id=' + id + '&In-Reply-To=' + this.id, {
                     headers: {
                         'Cookie': this.session.authCookie,
                     },
                     method: 'POST',
                     body: message,
                 });
-
+                const sendJson = await sendRes.json();
+                if (error(json, reject)) return;
                 resolve();
             } catch (err) {
                 reject(err);

@@ -8,3 +8,11 @@ export const encodeUrl = (str: string) => encodeURIComponent(str).replace(/!/g, 
     .replace(/\)/g, '%29')
     .replace(/\*/g, '%2A')
     .replace(/%20/g, '+');
+
+export const error = (res: any, reject: (reason: any) => void) => {
+    if (res.error) {
+        reject(JSON.parse(res.error));
+        return true;
+    }
+    return false;
+};

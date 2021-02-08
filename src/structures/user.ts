@@ -55,7 +55,7 @@ export default class User {
     sendMessage(subject: string, body: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                if (!this.session.authCookie) return reject();
+                if (!this.session.authCookie) return reject('Missing auth cookie.');
                 await this.session.sendMessage(subject, body, [this.id], parseBody, signature, attachments, cc, bcc);
                 resolve();
             } catch (err) {
