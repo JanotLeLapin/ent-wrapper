@@ -106,14 +106,13 @@ export default class Session {
                     headers: {
                         'Accept': '*/*',
                         'Accept-Encoding': 'gzip, deflate, br',
-                        'Accept-Language': 'en-US,en;q=0.9',
-                        'Cookie': 'webviewignored=true:1hPTD+eIINwwCLLaCxDmq1mvlTs=',
                         'Connection': 'keep-alive',
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'Content-Length': data.length,
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 OPR/73.0.3856.344',
                     },
                 }, res => {
+                    if (res.statusCode === 200) return reject('Auth failed.');
                     this.authCookie = res.headers['set-cookie']?.map(cookie => cookie.split(';')[0]).join(';');
                     res.destroy();
                     resolve();
