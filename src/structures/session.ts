@@ -169,6 +169,28 @@ export default class Session {
     }
 
     /**
+     * Fetches a message.
+     * @param messageId The id of the message
+     */
+    fetchMessage(messageId: number): Promise<Message> {
+        return new Promise<Message>(async (resolve, reject) => {
+            try {
+                if (!this.authCookie) return reject('Missing auth cookie.');
+                const res = await fetch(this.url + 'zimbra/message/' + messageId, {
+                    headers: {
+                        'Cookie': this.authCookie,
+                    },
+                });
+                const json = await res.json();
+                if (error(json, reject)) return;
+                resolve(new Message({ ...json, session: this }));
+            } catch (err) {
+                reject(err);
+            }
+        })
+    }
+
+    /**
      * Fetches informations about the user.
      */
     fetchCurrenthUserInfo(): Promise<IUser> {
