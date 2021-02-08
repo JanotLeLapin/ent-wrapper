@@ -25,6 +25,7 @@ export default class Message {
     threadId: string;
     to: string[];
     unread: boolean;
+    body?: string;
 
     constructor(data: any) {
         this.session = data.session;
@@ -45,6 +46,7 @@ export default class Message {
         this.threadId = data.thread_id;
         this.to = data.to;
         this.unread = data.unread;
+        this.body = data.body;
     }
 
     /**
@@ -55,6 +57,7 @@ export default class Message {
         return new Promise<string>(async (resolve, reject) => {
             try {
                 if (!this.session.authCookie) return reject('Missing auth cookie.');
+                if (this.body) return resolve(this.body);
                 const res = await fetch(this.session.url + 'zimbra/message/' + this.id, {
                     headers: {
                         'Cookie': this.session.authCookie,
