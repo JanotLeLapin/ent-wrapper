@@ -139,7 +139,23 @@ export default class Message {
         });
     }
 
+    /**
+     * Moves the message to the trash folder.
+     */
+    moveToTrash(): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                if (!this.session.authCookie) return reject('Missing auth cookie.');
+
+                const res = await fetch(this.session.url + 'zimbra/trash?id=' + this.id, {
+                    headers: {
+                        'Cookie': this.session.authCookie,
+                    },
+                    method: 'PUT',
+                });
+                const json = await res.json();
                 if (error(json, reject)) return;
+
                 resolve();
             } catch (err) {
                 reject(err);
