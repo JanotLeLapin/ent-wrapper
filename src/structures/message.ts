@@ -162,4 +162,28 @@ export default class Message {
             }
         });
     }
+
+    /**
+     * Permanently deletes the message.
+     */
+    delete(): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                if (!this.session.authCookie) return reject('Missing auth cookie.');
+
+                const res = await fetch(this.session.url + 'zimbra/delete?id=' + this.id, {
+                    headers: {
+                        'Cookie': this.session.authCookie,
+                    },
+                    method: 'DELETE',
+                });
+                const json = await res.json();
+                if (error(json, reject)) return;
+
+                resolve();
+            } catch (err) {
+                reject(err);
+            }
+        })
+    }
 };
