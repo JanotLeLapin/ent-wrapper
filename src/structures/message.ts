@@ -4,8 +4,6 @@ import { htmlToText } from 'html-to-text';
 import Session from './session';
 import User from './user';
 
-import { baseUrl } from '../util';
-
 export default class Message {
     session: Session;
 
@@ -55,7 +53,7 @@ export default class Message {
         return new Promise<string>(async (resolve, reject) => {
             try {
                 if (!this.session.authCookie) return;
-                const res = await fetch(baseUrl + 'zimbra/message/' + this.id, {
+                const res = await fetch(this.session.url + 'zimbra/message/' + this.id, {
                     headers: {
                         'Cookie': this.session.authCookie,
                     },
@@ -105,7 +103,7 @@ export default class Message {
                     to: [this.from],
                 });
 
-                const res = await fetch(baseUrl + 'zimbra/draft?In-Reply-To=' + this.id + '&reply=undefined', {
+                const res = await fetch(this.session.url + 'zimbra/draft?In-Reply-To=' + this.id + '&reply=undefined', {
                     headers: {
                         'Cookie': this.session.authCookie,
                     },
@@ -115,7 +113,7 @@ export default class Message {
                 const json = await res.json();
                 const id = json.id;
 
-                await fetch(baseUrl + 'zimbra/send?id=' + id + '&In-Reply-To=' + this.id, {
+                await fetch(this.session.url + 'zimbra/send?id=' + id + '&In-Reply-To=' + this.id, {
                     headers: {
                         'Cookie': this.session.authCookie,
                     },

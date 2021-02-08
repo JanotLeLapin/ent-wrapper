@@ -3,7 +3,7 @@ import https from 'https';
 
 import Message from './message';
 
-import { baseUrl, encodeUrl } from '../util';
+import { encodeUrl } from '../util';
 import User from './user';
 
 export interface IUser {
@@ -86,13 +86,16 @@ export interface IWidget {
 
 export default class Session {
     authCookie?: string;
+    url?: string;
 
     /**
      * Fetches a session cookie from the API.
+     * @param url The ent url, depending on your region (eg: ent.iledefrance.fr)
      * @param username Your ENT username (usually first name.last name)
      * @param password Your ENT password
      */
-    login(username: string, password: string): Promise<void> {
+    login(url: string, username: string, password: string): Promise<void> {
+        this.url = (url.startsWith('https://') ? url : 'https://' + url) + (url.endsWith('/') ? '' : '/');
         return new Promise<void>(async (resolve, reject) => {
             try {
                 const data = `email=${username}&password=${encodeUrl(password)}&callBack=https%253A%252F%252Fent.iledefrance.fr%252Ftimeline%252Ftimeline&details=`;
@@ -130,7 +133,7 @@ export default class Session {
         return new Promise<string>(async (resolve, reject) => {
             try {
                 if (!this.authCookie) return reject();
-                const res = await fetch(baseUrl + 'userbook/preference/language', {
+                const res = await fetch(this.url + 'userbook/preference/language', {
                     headers: {
                         'Cookie': this.authCookie,
                     },
@@ -151,7 +154,7 @@ export default class Session {
         return new Promise<Message[]>(async (resolve, reject) => {
             try {
                 if (!this.authCookie) return reject();
-                const res = await fetch(baseUrl + 'zimbra/list?folder=Inbox&page=' + page + '&unread=false', {
+                const res = await fetch(this.url + 'zimbra/list?folder=Inbox&page=' + page + '&unread=false', {
                     headers: {
                         'Cookie': this.authCookie,
                     },
@@ -171,7 +174,7 @@ export default class Session {
         return new Promise<IUser>(async (resolve, reject) => {
             try {
                 if (!this.authCookie) return reject();
-                const res = await fetch(baseUrl + 'auth/oauth2/userinfo', {
+                const res = await fetch(this.url + 'auth/oauth2/userinfo', {
                     headers: {
                         'Cookie': this.authCookie,
                     },
@@ -193,7 +196,7 @@ export default class Session {
         return new Promise<User>(async (resolve, reject) => {
             try {
                 if (!this.authCookie) return reject();
-                const res = await fetch(baseUrl + 'userbook/api/person?id=' + userId, {
+                const res = await fetch(this.url + 'userbook/api/person?id=' + userId, {
                     headers: {
                         'Cookie': this.authCookie,
                     },
@@ -231,7 +234,7 @@ export default class Session {
                     to,
                 });
 
-                const res = await fetch(baseUrl + 'zimbra/draft', {
+                const res = await fetch(this.url + 'zimbra/draft', {
                     headers: {
                         'Cookie': this.authCookie,
                     },
@@ -241,7 +244,7 @@ export default class Session {
                 const json = await res.json();
                 const id = json.id;
 
-                await fetch(baseUrl + 'zimbra/send?id=' + id, {
+                await fetch(this.url + 'zimbra/send?id=' + id, {
                     headers: {
                         'Cookie': this.authCookie,
                     },

@@ -1,9 +1,4 @@
 /**
- * The base API url.
- */
-export const baseUrl = 'https://ent.iledefrance.fr/';
-
-/**
  * Encodes string to an url.
  * @param str The string to encode
  */
