@@ -67,7 +67,7 @@ user.sendMessage('Hello', `Hey there ${user.displayName}, just wanted to let you
 const message = messages[0];
 
 // Responding to the message
-message.reply('Thank you', `The message you just sent, "${message.subject}", was very insightful.`, true, 'JanotLeLapin');
+message.reply(`The message you just sent, "${message.subject}", was very insightful.`, undefined, true, 'JanotLeLapin');
 
 // Or sending a message to multiple people
 
