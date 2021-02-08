@@ -3,7 +3,7 @@ import https from 'https';
 
 import Message from './message';
 
-import { baseUrl } from '../util';
+import { baseUrl, encodeUrl } from '../util';
 import User from './user';
 
 export interface IUser {
@@ -95,7 +95,7 @@ export default class Session {
     login(username: string, password: string): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             try {
-                const data = `email=${username}&password=${password}&callBack=https%253A%252F%252Fent.iledefrance.fr%252Ftimeline%252Ftimeline&details=`;
+                const data = encodeUrl(`email=${username}&password=${password}&callBack=https%253A%252F%252Fent.iledefrance.fr%252Ftimeline%252Ftimeline&details=`);
                 const req = https.request({
                     hostname: 'ent.iledefrance.fr',
                     path: '/auth/login',
