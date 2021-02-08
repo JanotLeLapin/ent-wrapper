@@ -2,7 +2,7 @@
 A wrapper for the ent api written in TypeScript
 
 ## Warning
-For now this library only works with the region iledefrance. If you want your region to be supported, feel free to open an issue.
+For now, this library has only been tested with the region ildedefrance. If your region does not work, feel free to open an issue.
 
 ## Example usage
 ```ts
