@@ -4,25 +4,68 @@ A wrapper for the ent api written in TypeScript
 ## Warning
 For now this library only works with the region iledefrance. If you want your region to be supported, feel free to open an issue.
 
-### Example usage
+## Example usage
 ```ts
 const Ent = require('ent-wrapper');
 
 const run = async () => {
-    const user = new Ent.User();
+    try {
+        const session = new Ent.Session();
 
-    // Logging in
-    await user.login('firstname.lastname', 'password');
+        // Logging in
+        await user.login('firstname.lastname', 'password');
 
-    // Fetching messages at page 0
-    const messages = await user.fetchMessages(0);
-    // Logging messages subjects
-    console.log(messages.map(message => message.subject));
+        // Fetching user informations
+        const userInfo = await session.fetchCurrenthUserInfo();
 
-    // Fetching, parsing and logging the body of the latest message
-    const messageBody = await messages[0].fetchBody(true);
-    console.log(messageBody);
+        // Logging user level
+        console.log(userInfo.level); // SECONDE GENERALE & TECHNO
+    } catch (err) {
+        console.error(err);
+    }
 };
 
 run();
+```
+
+## Messages
+
+### Fetching messages
+
+```ts
+// Fetching every inbox messages at page 0
+const messages = await session.fetchMessages(0);
+
+// Getting the latest message
+const message = messages[0];
+
+// Fetching the body of the message and converting it from HTML to text
+const body = await message.fetchBody(true);
+
+// Fetching the author of the message
+const author = await message.fetchAuthor();
+
+// Logging the message
+console.log(`A message from ${author.displayName}:\n\nSubject: ${message.subject}\n${body}`);
+```
+
+### Sending messages
+```ts
+// Fetching an user
+const user = await session.fetchUser('user id');
+
+// Sending the user a message
+user.sendMessage('Hello', `Hey there ${user.displayName}, just wanted to let you know you're a great person!`, true, 'JanotLeLapin');
+
+// Or replying to a message
+
+// Getting the latest message
+const message = messages[0];
+
+// Responding to the message
+message.reply('Thank you', `The message you just sent, "${message.subject}", was very insightful.`, true, 'JanotLeLapin');
+
+// Or sending a message to multiple people
+
+session.sendMessage('Hello everyone', 'How are you guys doing?', ['user 1 id', 'user 2 id'], true, 'JanotLeLapin');
 ```
