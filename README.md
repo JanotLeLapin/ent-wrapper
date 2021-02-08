@@ -13,7 +13,7 @@ const run = async () => {
         const session = new Ent.Session();
 
         // Logging in
-        await user.login('ent.iledefrance.fr', 'firstname.lastname', 'password');
+        await session.login('ent.iledefrance.fr', 'firstname.lastname', 'password');
 
         // Fetching user informations
         const userInfo = await session.fetchCurrenthUserInfo();
@@ -34,7 +34,7 @@ run();
 
 ```ts
 // Fetching every inbox messages at page 0
-const messages = await session.fetchMessages(0);
+const messages = await session.fetchInboxMessages(0);
 
 // Getting the latest message
 const message = messages[0];
