@@ -150,7 +150,7 @@ export default class Session {
      * Fetches a list of messages from the user's inbox.
      * @param page The inbox page
      */
-    fetchMessages(page: number): Promise<Message[]> {
+    fetchInboxMessages(page: number): Promise<Message[]> {
         return new Promise<Message[]>(async (resolve, reject) => {
             try {
                 if (!this.authCookie) return reject('Missing auth cookie.');
