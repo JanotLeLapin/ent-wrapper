@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import { htmlToText } from 'html-to-text';
 
 import Session from './session';
+import User from './user';
 
 import { baseUrl } from '../util';
 
@@ -65,6 +66,18 @@ export default class Message {
                 reject(err);
             }
         });
+    }
+
+    fetchAuthor(): Promise<User> {
+        return new Promise<User>(async (resolve, reject) => {
+            try {
+                if (!this.session.authCookie) return;
+                const user = await this.session.fetchUser(this.from);
+                resolve(user);
+            } catch (err) {
+                reject(err);
+            }
+        })
     }
 
     /**
