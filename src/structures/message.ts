@@ -98,17 +98,19 @@ export default class Message {
      * @param cc
      * @param bcc
      */
-    reply(subject: string, body: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<number> {
+    reply(body: string, subject?: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<number> {
         return new Promise<number>(async (resolve, reject) => {
             try {
                 if (!this.session.authCookie) return reject('Missing auth cookie.');
 
+                const currentUserInfo = await this.session.fetchCurrenthUserInfo();
+
                 const message = JSON.stringify({
                     attachments: attachments ? attachments : [],
                     bcc: bcc ? bcc : [],
-                    body: (parseBody ? body.split('\n').map(line => `<div class="ng-scope">${line}</div>`).join('') : body) + (signature ? `<div class="signature new-signature ng-scope">${signature}</div>` : ''),
+                    body: (parseBody ? body.split('\n').map(line => `<div class="ng-scope">${line}</div>`).join('') : body) + (signature ? `<div class="signature new-signature ng-scope">${signature}</div>` : '') + (parseBody ? `<p class="ng-scope">&nbsp;</p>\n<p class="row ng-scope"></p>\n<hr class="ng-scope">\n<p class="ng-scope"></p>\n<p class="medium-text ng-scope">\n    <span translate=""><span class="no-style ng-scope">De :</span></span><em class="ng-binding"> ${(await this.fetchAuthor()).displayName}</em>\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">Date :</span></span><em class="ng-binding"> ${this.date.toLocaleString('fr')} </em>\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">Objet :</span></span><em class="ng-binding"> ${this.subject}</em>\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">À :</span></span>\n    <!-- ngRepeat: receiver in mail.to --><em class="medium-importance ng-scope"><em class="ng-binding"> ${currentUserInfo.lastName} ${currentUserInfo.firstName}</em>\n    <!-- ngIf: $index !== mail.to.length - 1 && receiver.displayName -->\n    </em>\n    <!-- end ngRepeat: receiver in mail.to -->\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">Copie à :</span></span>\n    <!-- ngRepeat: receiver in mail.cc -->\n</p>\n<blockquote class="ng-scope">${await this.fetchBody(false)}</blockquote>` : ''),
                     cc: cc ? cc : [],
-                    subject,
+                    subject: subject ? subject : `Re : ${this.subject}`,
                     to: [this.from],
                 });
 
