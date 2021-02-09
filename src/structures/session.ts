@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import https from 'https';
 
-import Message from './message';
+import Message, { IMessageConfig } from './message';
 import User, { UserPreview, profile } from './user';
 import App from './app';
 
@@ -288,27 +288,21 @@ export default class Session {
 
     /**
      * Sends a message to a list of ENT users and returns the message id.
-     * @param subject The subject of the message
-     * @param body The body of the message
-     * @param to A list of users ids
-     * @param parseBody Wether the body should be parsed or not
-     * @param signature A custom signature
-     * @param attachments A list of attachments
-     * @param cc
-     * @param bcc
+     * @param config The configuration of the message
      */
-    sendMessage(subject: string, body: string, to: string[], parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<number> {
+    sendMessage(config: IMessageConfig): Promise<number> {
         return new Promise<number>(async (resolve, reject) => {
             try {
                 if (!this.authCookie) return reject('Missing auth cookie.');
+                if (!config.to) return reject('No destination specified.');
 
                 const message = JSON.stringify({
-                    attachments: attachments ? attachments : [],
-                    bcc: bcc ? bcc : [],
-                    body: (parseBody ? body.split('\n').map(line => `<div class="ng-scope">${line}</div>`).join('') : body) + (signature ? `<div class="signature new-signature ng-scope">${signature}</div>` : ''),
-                    cc: cc ? cc : [],
-                    subject,
-                    to,
+                    attachments: config.attachments ? config.attachments : [],
+                    bcc: config.bcc ? config.bcc : [],
+                    body: (config.parseBody ? config.body.split('\n').map(line => `<div class="ng-scope">${line}</div>`).join('') : config.body) + (config.signature ? `<div class="signature new-signature ng-scope">${config.signature}</div>` : ''),
+                    cc: config.cc ? config.cc : [],
+                    subject: config.subject ? config.subject : '(Aucun objet)',
+                    to: config.to,
                 });
 
                 const res = await fetch(this.url + 'zimbra/draft', {

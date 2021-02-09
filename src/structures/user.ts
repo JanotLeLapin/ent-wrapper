@@ -1,4 +1,5 @@
 import Session from './session';
+import { IMessage, IMessageConfig } from './message';
 
 export interface IUserPreview {
     id: string;
@@ -153,20 +154,13 @@ export default class User {
 
     /**
      * Sends a message to this user and returns the message id.
-     * @param subject The subject of the message
-     * @param body The body of the message
-     * @param to A list of users ids
-     * @param parseBody Wether the body should be parsed or not
-     * @param signature A custom signature
-     * @param attachments A list of attachments
-     * @param cc
-     * @param bcc
+     * @param config The configuration of the message
      */
-    sendMessage(subject: string, body: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<number> {
+    sendMessage(config: IMessageConfig): Promise<number> {
         return new Promise<number>(async (resolve, reject) => {
             try {
                 if (!this.session.authCookie) return reject('Missing auth cookie.');
-                const id = await this.session.sendMessage(subject, body, [this.id], parseBody, signature, attachments, cc, bcc);
+                const id = await this.session.sendMessage(config);
                 resolve(id);
             } catch (err) {
                 reject(err);

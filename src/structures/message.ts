@@ -26,6 +26,17 @@ export interface IMessage {
     body?: string;
 };
 
+export interface IMessageConfig {
+    body: string;
+    subject?: string;
+    parseBody?: boolean;
+    signature?: string;
+    attachments?: string;
+    cc?: string[];
+    bcc?: string;
+    to?: string[];
+};
+
 export default class Message {
     session: Session;
 
@@ -134,16 +145,9 @@ export default class Message {
 
     /**
      * Replies to this message and returns the reply's id.
-     * @param subject The subject of the message
-     * @param body The body of the message
-     * @param to A list of users ids
-     * @param parseBody Wether the body should be parsed or not
-     * @param signature A custom signature
-     * @param attachments A list of attachments
-     * @param cc
-     * @param bcc
+     * @param config The configuration of the message
      */
-    reply(body: string, subject?: string, parseBody?: boolean, signature?: string, attachments?: string[], cc?: string[], bcc?: string[]): Promise<number> {
+    reply(config: IMessageConfig): Promise<number> {
         return new Promise<number>(async (resolve, reject) => {
             try {
                 if (!this.session.authCookie) return reject('Missing auth cookie.');
@@ -151,11 +155,11 @@ export default class Message {
                 const currentUserInfo = await this.session.fetchCurrenthUserInfo();
 
                 const message = JSON.stringify({
-                    attachments: attachments ? attachments : [],
-                    bcc: bcc ? bcc : [],
-                    body: (parseBody ? body.split('\n').map(line => `<div class="ng-scope">${line}</div>`).join('') : body) + (signature ? `<div class="signature new-signature ng-scope">${signature}</div>` : '') + (parseBody ? `<p class="ng-scope">&nbsp;</p>\n<p class="row ng-scope"></p>\n<hr class="ng-scope">\n<p class="ng-scope"></p>\n<p class="medium-text ng-scope">\n    <span translate=""><span class="no-style ng-scope">De :</span></span><em class="ng-binding"> ${(await this.fetchAuthor()).displayName}</em>\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">Date :</span></span><em class="ng-binding"> ${this.date.toLocaleString('fr')} </em>\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">Objet :</span></span><em class="ng-binding"> ${this.subject}</em>\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">À :</span></span>\n    <!-- ngRepeat: receiver in mail.to --><em class="medium-importance ng-scope"><em class="ng-binding"> ${currentUserInfo.lastName} ${currentUserInfo.firstName}</em>\n    <!-- ngIf: $index !== mail.to.length - 1 && receiver.displayName -->\n    </em>\n    <!-- end ngRepeat: receiver in mail.to -->\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">Copie à :</span></span>\n    <!-- ngRepeat: receiver in mail.cc -->\n</p>\n<blockquote class="ng-scope">${await this.fetchBody(false)}</blockquote>` : ''),
-                    cc: cc ? cc : [],
-                    subject: subject ? subject : `Re : ${this.subject}`,
+                    attachments: config.attachments ? config.attachments : [],
+                    bcc: config.bcc ? config.bcc : [],
+                    body: (config.parseBody ? config.body.split('\n').map(line => `<div class="ng-scope">${line}</div>`).join('') : config.body) + (config.signature ? `<div class="signature new-signature ng-scope">${config.signature}</div>` : '') + (config.parseBody ? `<p class="ng-scope">&nbsp;</p>\n<p class="row ng-scope"></p>\n<hr class="ng-scope">\n<p class="ng-scope"></p>\n<p class="medium-text ng-scope">\n    <span translate=""><span class="no-style ng-scope">De :</span></span><em class="ng-binding"> ${(await this.fetchAuthor()).displayName}</em>\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">Date :</span></span><em class="ng-binding"> ${this.date.toLocaleString('fr')} </em>\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">Objet :</span></span><em class="ng-binding"> ${this.subject}</em>\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">À :</span></span>\n    <!-- ngRepeat: receiver in mail.to --><em class="medium-importance ng-scope"><em class="ng-binding"> ${currentUserInfo.lastName} ${currentUserInfo.firstName}</em>\n    <!-- ngIf: $index !== mail.to.length - 1 && receiver.displayName -->\n    </em>\n    <!-- end ngRepeat: receiver in mail.to -->\n    <br><span class="medium-importance" translate=""><span class="no-style ng-scope">Copie à :</span></span>\n    <!-- ngRepeat: receiver in mail.cc -->\n</p>\n<blockquote class="ng-scope">${await this.fetchBody(false)}</blockquote>` : ''),
+                    cc: config.cc ? config.cc : [],
+                    subject: config.subject ? config.subject : `Re : ${this.subject}`,
                     to: [this.from],
                 });
 
