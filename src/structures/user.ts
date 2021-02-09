@@ -1,4 +1,11 @@
-import Session from './session';
+import Session, { profile } from './session';
+
+export interface IUserPreview {
+    id: string;
+    displayName: string;
+    groupDisplayName: string;
+    profile: profile;
+}
 
 export interface IUser {
     id: string;
@@ -20,6 +27,51 @@ export interface IUser {
     birthdate: string;
     hobbies: string;
 }
+
+export class UserPreview {
+    session?: Session;
+
+    id: string;
+    displayName: string;
+    groupDisplayName: string;
+    profile: profile;
+
+    constructor(data: any) {
+        this.session = data.session;
+
+        this.id = data.id;
+        this.displayName = data.displayName;
+        this.groupDisplayName = data.groupDisplayName;
+        this.profile = data.profile;
+    }
+
+    /**
+     * Returns this user preview instance as a JSON object.
+     */
+    toJSON(): IUserPreview {
+        return {
+            id: this.id,
+            displayName: this.displayName,
+            groupDisplayName: this.groupDisplayName,
+            profile: this.profile,
+        };
+    }
+
+    /**
+     * Fetches user from userpreview.
+     */
+    fetchUser(): Promise<User> {
+        return new Promise<User>(async (resolve, reject) => {
+            try {
+                if (!this.session) return reject('Missing auth cookie.');
+                const user = await this.session.fetchUser(this.id);
+                resolve(user);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+};
 
 export default class User {
     session: Session;
