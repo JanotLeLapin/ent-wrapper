@@ -7,6 +7,12 @@ export interface IUserPreview {
     profile: profile;
 }
 
+export interface IHobby {
+    visibility: 'PUBLIC' | 'PRIVE';
+    category: string;
+    values: string;
+}
+
 export interface IUser {
     id: string;
     login: string;
@@ -25,7 +31,7 @@ export interface IUser {
     tel: string;
     mobile: string;
     birthdate: string;
-    hobbies: string;
+    hobbies: IHobby[];
 }
 
 export type profile = 'Teacher' | 'Guest'  | 'Relative' | 'Personnel' | 'Student';
@@ -102,7 +108,7 @@ export default class User {
     tel: string;
     mobile: string;
     birthdate: string;
-    hobbies: string;
+    hobbies: IHobby[];
 
     constructor(data: any) {
         this.session = data.session;
