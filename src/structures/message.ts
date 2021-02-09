@@ -24,7 +24,7 @@ export interface IMessage {
     to: string[];
     unread: boolean;
     body?: string;
-}
+};
 
 export default class Message {
     session: Session;

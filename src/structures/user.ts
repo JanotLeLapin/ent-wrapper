@@ -5,13 +5,13 @@ export interface IUserPreview {
     displayName: string;
     groupDisplayName: string;
     profile: profile;
-}
+};
 
 export interface IHobby {
     visibility: 'PUBLIC' | 'PRIVE';
     category: string;
     values: string;
-}
+};
 
 export interface IUser {
     id: string;
@@ -32,7 +32,7 @@ export interface IUser {
     mobile: string;
     birthdate: string;
     hobbies: IHobby[];
-}
+};
 
 export type profile = 'Teacher' | 'Guest'  | 'Relative' | 'Personnel' | 'Student';
 

@@ -17,7 +17,7 @@ export interface IApp {
     prefix?: string;
     casType?: string;
     scope: scope[];
-}
+};
 
 export default class App {
     session: Session;
