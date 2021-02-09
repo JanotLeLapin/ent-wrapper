@@ -9,6 +9,11 @@ export const encodeUrl = (str: string) => encodeURIComponent(str).replace(/!/g, 
     .replace(/\*/g, '%2A')
     .replace(/%20/g, '+');
 
+/**
+ * Checks if a response contains an error and rejects it.
+ * @param res The node fetch json response
+ * @param reject The promise reject function
+ */
 export const error = (res: any, reject: (reason: any) => void) => {
     if (res.error) {
         reject(JSON.parse(res.error));
