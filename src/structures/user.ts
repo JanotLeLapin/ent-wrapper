@@ -1,4 +1,4 @@
-import Session, { profile } from './session';
+import Session from './session';
 
 export interface IUserPreview {
     id: string;
@@ -29,7 +29,7 @@ export interface IUser {
 }
 
 export class UserPreview {
-    session?: Session;
+    session: Session;
 
     id: string;
     displayName: string;
