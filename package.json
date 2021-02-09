@@ -2,6 +2,13 @@
     "name": "ent-wrapper",
     "version": "0.0.7",
     "description": "A wrapper for the ent api written in TypeScript",
+    "keywords": [
+        "ent",
+        "api",
+        "client",
+        "promise",
+        "node"
+    ],
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "repository": "https://github.com/JanotLeLapin/ent-wrapper.git",
