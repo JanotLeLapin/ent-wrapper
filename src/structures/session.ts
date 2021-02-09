@@ -2,9 +2,10 @@ import fetch from 'node-fetch';
 import https from 'https';
 
 import Message from './message';
+import User from './user';
+import App from './app';
 
 import { encodeUrl, error } from '../util';
-import User from './user';
 
 export interface IUser {
     classNames:          string[];
