@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import https from 'https';
 
 import Message from './message';
-import User from './user';
+import User, { UserPreview } from './user';
 import App from './app';
 
 import { encodeUrl, error } from '../util';
@@ -60,6 +60,16 @@ export interface IWidget {
     mandatory:   boolean;
     id:          string;
     js:          string;
+};
+
+export type profile = 'Teacher' | 'Guest'  | 'Relative' | 'Personnel' | 'Student';
+
+export interface IQuery {
+    classes?: string[];
+    functions?: string[];
+    mood?: boolean;
+    profiles?: profile[];
+    search?: string;
 };
 
 export default class Session {
@@ -278,6 +288,31 @@ export default class Session {
             }
         });
     };
+
+    /**
+     * Searches for user profiles and returns an UserPreview array.
+     * @param query The query
+     */
+    searchUsers(query: IQuery): Promise<UserPreview[]> {
+        return new Promise<UserPreview[]>(async (resolve, reject) => {
+            try {
+                if (!this.authCookie || !this.xsrf) return reject('Missing auth cookie.');
+                const res = await fetch(this.url + 'communication/visible', {
+                    headers: {
+                        'Cookie': this.authCookie,
+                        'X-XSRF-TOKEN': this.xsrf,
+                    },
+                    method: 'POST',
+                    body: JSON.stringify(query),
+                });
+                const json: { users: any[] } = await res.json();
+                if (error(json, reject)) return;
+                resolve(json.users.map(userpreview => new UserPreview({ ...userpreview, session: this })));
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
 
     /**
      * Fetches an ENT user from its id.
