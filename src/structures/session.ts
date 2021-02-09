@@ -5,7 +5,7 @@ import Message from './message';
 import User, { UserPreview } from './user';
 import App from './app';
 
-import { encodeUrl, error } from '../util';
+import { encodeUrl, processCookies, error } from '../util';
 
 export interface IUser {
     classNames:          string[];
@@ -74,6 +74,7 @@ export interface IQuery {
 
 export default class Session {
     authCookie?: string;
+    xsrf?: string;
     url?: string;
 
     /**
@@ -87,7 +88,7 @@ export default class Session {
         return new Promise<void>(async (resolve, reject) => {
             try {
                 const data = `email=${username}&password=${encodeUrl(password)}&callBack=https%253A%252F%252Fent.iledefrance.fr%252Ftimeline%252Ftimeline&details=`;
-                const req = https.request({
+                const req0 = https.request({
                     hostname: 'ent.iledefrance.fr',
                     path: '/auth/login',
                     method: 'POST',
@@ -99,14 +100,30 @@ export default class Session {
                         'Content-Length': data.length,
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 OPR/73.0.3856.344',
                     },
-                }, res => {
-                    if (res.statusCode === 200) return reject('Auth failed.');
-                    this.authCookie = res.headers['set-cookie']?.map(cookie => cookie.split(';')[0]).join(';');
-                    res.destroy();
-                    resolve();
+                }, res0 => {
+                    res0.destroy();
+                    if (res0.statusCode === 200 || !res0.headers['set-cookie']) return reject('Auth failed.');
+                    this.authCookie = processCookies([...res0.headers['set-cookie']]);
+                    const req1 = https.request({
+                        hostname: 'ent.iledefrance.fr',
+                        path: '/timeline/timeline',
+                        method: 'GET',
+                        headers: {
+                            'Accept': '*/*',
+                            'Accept-Encoding': 'gzip, deflate, br',
+                            'Cookie': processCookies(res0.headers['set-cookie']),
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 OPR/73.0.3856.344',
+                        },
+                    }, res1 => {
+                        res1.destroy();
+                        if (!res1.headers['set-cookie']) return reject('Auth failed.');
+                        this.xsrf = res1.headers['set-cookie'].find(cookie => cookie.includes('XSRF'))?.split('=')[1]?.split(';')[0];
+                        resolve();
+                    });
+                    req1.end();
                 });
-                req.write(data);
-                req.end();
+                req0.write(data);
+                req0.end();
             } catch (err) {
                 reject(err);
             }
