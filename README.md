@@ -9,7 +9,7 @@
     </p>
 </div>
 
-Ent Wrapper is a promise based wrapper for the Ent api.
+Ent Wrapper is a promise based wrapper for the Ent api. It takes an object-oriented approach, which makes the code easier to read.
 
 ## Warning
 For now, this library has only been tested with the region ildedefrance. If your region does not work, feel free to open an issue.
@@ -69,7 +69,12 @@ console.log(`A message from ${author.displayName}:\n\nSubject: ${message.subject
 const user = await session.fetchUser('user id');
 
 // Sending the user a message
-user.sendMessage('Hello', `Hey there ${user.displayName}, just wanted to let you know you're a great person!`, true, 'JanotLeLapin');
+user.sendMessage({
+    subject: 'Hello',
+    body: `Hey there ${user.displayName}, just wanted to let you know you're a great person!`,
+    parseBody: true,
+    signature: 'JanotLeLapin',
+});
 
 // Or replying to a message
 
@@ -79,12 +84,21 @@ const messages = await session.fetchMessages('Inbox', 0);
 // Getting the latest message
 const message = messages[0];
 
-// Responding to the message
-message.reply(`The message you just sent, "${message.subject}", was very insightful.`, undefined, true, 'JanotLeLapin');
+// Replying to the message
+message.reply({
+    body: `The message you just sent, "${message.subject}", was very insightful.`,
+    parseBody: true,
+    signature: 'JanotLeLapin',
+});
 
 // Or sending a message to multiple people
-
-session.sendMessage('Hello everyone', 'How are you guys doing?', ['user 1 id', 'user 2 id'], true, 'JanotLeLapin');
+session.sendMessage({
+    subject: 'Hello everyone',
+    body: 'How are you guys doing?',
+    parseBody: true,
+    to: ['user 1 id', 'user 2 id'],
+    signature: 'JanotLeLapin',
+});
 ```
 
 ### Deleting messages
