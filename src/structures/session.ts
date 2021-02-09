@@ -153,11 +153,12 @@ export default class Session {
      * Fetches a list of messages from the user's inbox.
      * @param page The inbox page
      */
-    fetchInboxMessages(page: number): Promise<Message[]> {
+    fetchMessages(folder: 'Inbox' | 'Sent' | 'Drafts' | 'Trash', page: number): Promise<Message[]> {
         return new Promise<Message[]>(async (resolve, reject) => {
             try {
                 if (!this.authCookie) return reject('Missing auth cookie.');
-                const res = await fetch(this.url + 'zimbra/list?folder=Inbox&page=' + page + '&unread=false', {
+                if (!['Inbox', 'Sent', 'Drafts', 'Trash'].includes(folder)) return reject('Invalid folder.');
+                const res = await fetch(this.url + 'zimbra/list?folder=' + folder + '&page=' + page + '&unread=false', {
                     headers: {
                         'Cookie': this.authCookie,
                     },
@@ -169,72 +170,6 @@ export default class Session {
                 reject(err);
             }
         });
-    }
-
-    /**
-     * Fetches a list of messages from the user's outbox.
-     * @param page The outbox page
-     */
-    fetchOutboxMessages(page: number): Promise<Message[]> {
-        return new Promise<Message[]>(async (resolve, reject) => {
-            try {
-                if (!this.authCookie) return reject('Missing auth cookie.');
-                const res = await fetch(this.url + 'zimbra/list?folder=/Sent&page=' + page + '&unread=false', {
-                    headers: {
-                        'Cookie': this.authCookie,
-                    },
-                });
-                const json: any[] = await res.json();
-                if (error(json, reject)) return;
-                resolve(json.map(message => new Message({ ...message, session: this })));
-            } catch (err) {
-                reject(err);
-            }
-        })
-    }
-
-    /**
-     * Fetches a list of messages from the user's drafts.
-     * @param page The drafts page
-     */
-    fetchDraftMessages(page: number): Promise<Message[]> {
-        return new Promise<Message[]>(async (resolve, reject) => {
-            try {
-                if (!this.authCookie) return reject('Missing auth cookie.');
-                const res = await fetch(this.url + 'zimbra/list?folder=/Drafts&page=' + page + '&unread=false', {
-                    headers: {
-                        'Cookie': this.authCookie,
-                    },
-                });
-                const json: any[] = await res.json();
-                if (error(json, reject)) return;
-                resolve(json.map(message => new Message({ ...message, session: this })));
-            } catch (err) {
-                reject(err);
-            }
-        })
-    }
-
-    /**
-     * Fetches a list of messages from the user's trash.
-     * @param page The trash page
-     */
-    fetchTrashMessages(page: number): Promise<Message[]> {
-        return new Promise<Message[]>(async (resolve, reject) => {
-            try {
-                if (!this.authCookie) return reject('Missing auth cookie.');
-                const res = await fetch(this.url + 'zimbra/list?folder=/Trash&page=' + page + '&unread=false', {
-                    headers: {
-                        'Cookie': this.authCookie,
-                    },
-                });
-                const json: any[] = await res.json();
-                if (error(json, reject)) return;
-                resolve(json.map(message => new Message({ ...message, session: this })));
-            } catch (err) {
-                reject(err);
-            }
-        })
     }
 
     /**

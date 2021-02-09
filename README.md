@@ -9,6 +9,8 @@
     </p>
 </div>
 
+Ent Wrapper is a promise based wrapper for the Ent api.
+
 ## Warning
 For now, this library has only been tested with the region ildedefrance. If your region does not work, feel free to open an issue.
 
@@ -42,7 +44,7 @@ run();
 
 ```ts
 // Fetching every inbox messages at page 0
-const messages = await session.fetchInboxMessages(0);
+const messages = await session.fetchMessages('Inbox', 0);
 
 // Getting the latest message
 const message = messages[0];
@@ -72,7 +74,7 @@ user.sendMessage('Hello', `Hey there ${user.displayName}, just wanted to let you
 // Or replying to a message
 
 // Fetching inbox messages
-const messages = await session.fetchInboxMessages(0);
+const messages = await session.fetchMessages('Inbox', 0);
 
 // Getting the latest message
 const message = messages[0];
@@ -88,7 +90,7 @@ session.sendMessage('Hello everyone', 'How are you guys doing?', ['user 1 id', '
 ### Deleting messages
 ```ts
 // Fetch sent messages
-const messages = await session.fetchOutboxMessages(0);
+const messages = await session.fetchMessages('Sent', 0);
 
 // Getting the latest message
 const message = messages[0];
