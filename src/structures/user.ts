@@ -71,6 +71,13 @@ export class UserPreview {
             }
         });
     }
+
+    /**
+     * Returns the users avatar url.
+     */
+    avatarURL() {
+        return this.session.url + 'userbook/avatar/' + this.id + '?thumbnail=381x381';
+    }
 };
 
 export default class User {
@@ -157,5 +164,12 @@ export default class User {
                 reject(err);
             }
         });
+    }
+
+    /**
+     * Returns the users avatar url.
+     */
+    avatarURL() {
+        return this.session.url + 'userbook/avatar/' + this.id + '?thumbnail=381x381';
     }
 };
