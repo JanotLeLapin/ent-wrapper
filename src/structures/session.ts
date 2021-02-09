@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import https from 'https';
 
 import Message from './message';
-import User, { UserPreview } from './user';
+import User, { UserPreview, profile } from './user';
 import App from './app';
 
 import { encodeUrl, processCookies, error } from '../util';
@@ -61,8 +61,6 @@ export interface IWidget {
     id:          string;
     js:          string;
 };
-
-export type profile = 'Teacher' | 'Guest'  | 'Relative' | 'Personnel' | 'Student';
 
 export interface IQuery {
     classes?: string[];

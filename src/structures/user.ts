@@ -28,6 +28,8 @@ export interface IUser {
     hobbies: string;
 }
 
+export type profile = 'Teacher' | 'Guest'  | 'Relative' | 'Personnel' | 'Student';
+
 export class UserPreview {
     session: Session;
 
