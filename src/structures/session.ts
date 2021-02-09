@@ -33,33 +33,10 @@ export interface IUser {
     hasApp:              boolean;
     classes:             string[];
     authorizedActions:   IAuthorizedAction[];
-    apps:                IApp[];
+    apps:                App[];
     childrenIds:         any[];
     children:            IChildren;
     widgets:             IWidget[];
-};
-
-export interface IApp {
-    name:        string;
-    address:     string;
-    icon:        string;
-    target:      Target | null;
-    displayName: string;
-    display:     boolean;
-    prefix:      null | string;
-    casType:     null | string;
-    scope:       Scope[];
-};
-
-export enum Scope {
-    Empty = '',
-    Myinfos = 'myinfos',
-    Userinfo = 'userinfo',
-};
-
-export enum Target {
-    Blank = '_blank',
-    Empty = '',
 };
 
 export interface IAuthorizedAction {
@@ -272,7 +249,7 @@ export default class Session {
                 const json = await res.json();
                 if (error(json, reject)) return;
                 const tempDate = json.birthDate.split('-');
-                resolve({ ...json, birthDate: new Date(tempDate[0], tempDate[1] - 1, tempDate[2]) });
+                resolve({ ...json, birthDate: new Date(tempDate[0], tempDate[1] - 1, tempDate[2]), apps: json.apps.map((app: any) => new App({ ...app, session: this })) });
             } catch (err) {
                 reject(err);
             }
