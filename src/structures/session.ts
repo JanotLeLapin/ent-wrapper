@@ -257,6 +257,29 @@ export default class Session {
     }
 
     /**
+     * Fetches the user's pinned apps.
+     */
+    fetchPinnedApps(): Promise<App[]> {
+        return new Promise<App[]>(async (resolve, reject) => {
+            try {
+                if (!this.authCookie) return reject('Missing auth cookie.');
+                const res = await fetch(this.url + 'userbook/preference/apps', {
+                    headers: {
+                        'Cookie': this.authCookie,
+                    },
+                });
+                const json = await res.json();
+                if (error(json, reject)) return;
+
+                const parsed: any[] = JSON.parse(json.preference);
+                resolve(parsed.map(app => new App({ ...app, session: this })));
+            } catch (err) {
+                reject(err);
+            }
+        });
+    };
+
+    /**
      * Fetches an ENT user from its id.
      * @param userId The id of the user
      */
