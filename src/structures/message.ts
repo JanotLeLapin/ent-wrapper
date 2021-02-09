@@ -6,6 +6,26 @@ import User from './user';
 
 import { error } from '../util';
 
+export interface IMessage {
+    attachments: any[];
+    bcc: any[];
+    cc: any[];
+    date: Date;
+    displayNames: string[][];
+    from: string;
+    hasAttachment: boolean;
+    id: string;
+    parentId: string;
+    response: boolean;
+    state: string;
+    subject: string;
+    systemFolder: string;
+    threadId: string;
+    to: string[];
+    unread: boolean;
+    body?: string;
+}
+
 export default class Message {
     session: Session;
 
@@ -47,6 +67,31 @@ export default class Message {
         this.to = data.to;
         this.unread = data.unread;
         this.body = data.body;
+    }
+
+    /**
+     * Returns this message instance as a JSON object.
+     */
+    toJSON(): IMessage {
+        return {
+            attachments: this.attachments,
+            bcc: this.bcc,
+            cc: this.cc,
+            date: this.date,
+            displayNames: this.displayNames,
+            from: this.from,
+            hasAttachment: this.hasAttachment,
+            id: this.id,
+            parentId: this.parentId,
+            response: this.response,
+            state: this.state,
+            subject: this.subject,
+            systemFolder: this.systemFolder,
+            threadId: this.threadId,
+            to: this.to,
+            unread: this.unread,
+            body: this.body,
+        };
     }
 
     /**

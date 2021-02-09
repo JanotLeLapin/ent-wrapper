@@ -1,5 +1,26 @@
 import Session from './session';
 
+export interface IUser {
+    id: string;
+    login: string;
+    displayName: string;
+    type: string[];
+    schools: {
+        classes: string[];
+        name:    string;
+        id:      string;
+    }[];
+    motto: string;
+    mood: string;
+    health: string;
+    address: string;
+    email: string;
+    tel: string;
+    mobile: string;
+    birthdate: string;
+    hobbies: string;
+}
+
 export default class User {
     session: Session;
 
@@ -40,6 +61,28 @@ export default class User {
         this.birthdate = data.birthdate;
         this.hobbies = data.hobbies;
     }
+
+    /**
+     * Returns this user instance as a JSON object.
+     */
+    toJSON(): IUser {
+        return {
+            id: this.id,
+            login: this.login,
+            displayName: this.displayName,
+            type: this.type,
+            schools: this.schools,
+            motto: this.motto,
+            mood: this.mood,
+            health: this.health,
+            address: this.address,
+            email: this.email,
+            tel: this.tel,
+            mobile: this.mobile,
+            birthdate: this.birthdate,
+            hobbies: this.hobbies,
+        };
+    };
 
     /**
      * Sends a message to this user and returns the message id.
