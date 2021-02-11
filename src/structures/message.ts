@@ -152,7 +152,7 @@ export default class Message {
             try {
                 if (!this.session.authCookie) return reject('Missing auth cookie.');
 
-                const currentUserInfo = await this.session.fetchCurrenthUserInfo();
+                const currentUserInfo = await this.session.fetchUserInfo();
 
                 const message = JSON.stringify({
                     attachments: config.attachments ? config.attachments : [],

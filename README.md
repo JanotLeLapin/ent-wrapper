@@ -36,7 +36,7 @@ const run = async () => {
         await session.login('ent.iledefrance.fr', 'firstname.lastname', 'password');
 
         // Fetching user informations
-        const userInfo = await session.fetchCurrenthUserInfo();
+        const userInfo = await session.fetchUserInfo();
 
         // Logging user level
         console.log(userInfo.level); // SECONDE GENERALE & TECHNO
