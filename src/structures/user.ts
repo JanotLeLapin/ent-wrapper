@@ -179,7 +179,10 @@ export default class User {
         return new Promise<number>(async (resolve, reject) => {
             try {
                 if (!this.session.authCookie) return reject('Missing auth cookie.');
-                const id = await this.session.sendMessage(config);
+                const id = await this.session.sendMessage({
+                    ...config,
+                    to: [...(config.to || []), this.id],
+                });
                 resolve(id);
             } catch (err) {
                 reject(err);
