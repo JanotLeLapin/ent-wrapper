@@ -16,8 +16,11 @@ export const encodeUrl = (str: string) => encodeURIComponent(str).replace(/!/g, 
  */
 export const error = (res: any, reject: (reason: any) => void) => {
     if (res.error) {
-        if (typeof res.error === 'string') reject(res.error);
-        else reject(JSON.parse(res.error));
+        try {
+            reject(JSON.parse(res.error));
+        } catch {
+            reject(res.error);
+        }
         return true;
     }
     return false;
