@@ -70,10 +70,6 @@ export interface IQuery {
     search?: string;
 };
 
-export interface IEvent {
-    ready: () => void;
-};
-
 export default class Session {
     authCookie?: string;
     xsrf?: string;
@@ -120,7 +116,6 @@ export default class Session {
                         res1.destroy();
                         if (!res1.headers['set-cookie']) return reject('Auth failed.');
                         this.xsrf = res1.headers['set-cookie'].find(cookie => cookie.includes('XSRF'))?.split('=')[1]?.split(';')[0];
-                        this.emit('ready');
                         resolve();
                     });
                     req1.end();
@@ -131,30 +126,6 @@ export default class Session {
                 reject(err);
             }
         });
-    }
-
-    handlers: {
-        [event: string]: any[];
-    } = {};
-
-    /**
-     * Registers an event handler.
-     * @param event The event to listen to
-     * @param callback A function to run when this event is triggered
-     */
-    on<K extends keyof IEvent>(event: K, callback: IEvent[K]) {
-        if (!this.handlers[event]) this.handlers[event] = [];
-        this.handlers[event].push(callback);
-    }
-
-    /**
-     * Fires an event.
-     * @param event The event to fire
-     * @param parameter The parameter to bind to the event
-     */
-    emit<K extends keyof IEvent>(event: K, parameter?: Parameters<IEvent[K]>[0]) {
-        if (!this.handlers[event]) this.handlers[event] = [];
-        this.handlers[event].forEach(handler => handler(parameter));
     }
 
     /**
