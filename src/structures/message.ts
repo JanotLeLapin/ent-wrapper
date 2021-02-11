@@ -106,7 +106,7 @@ export default class Message {
     }
 
     /**
-     * Fetches the message body.
+     * Fetches the message body and marks the message as read.
      * @param parse Wether the body should be decoded or not
      */
     fetchBody(parse: boolean): Promise<string> {

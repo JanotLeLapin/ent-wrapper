@@ -78,7 +78,7 @@ export default class Session {
     /**
      * Fetches a session cookie from the API.
      * @param url The ent url, depending on your region (eg: ent.iledefrance.fr)
-     * @param username Your ENT username (usually first name.last name)
+     * @param username Your ENT username (usually firstname.lastname)
      * @param password Your ENT password
      */
     login(url: string, username: string, password: string): Promise<void> {
@@ -150,8 +150,9 @@ export default class Session {
     }
 
     /**
-     * Fetches a list of messages from the user's inbox.
-     * @param page The inbox page
+     * Fetches a list of messages from the user.
+     * @param folder The system folder to fetch
+     * @param page The messages page
      */
     fetchMessages(folder: 'Inbox' | 'Sent' | 'Drafts' | 'Trash', page: number): Promise<Message[]> {
         return new Promise<Message[]>(async (resolve, reject) => {
@@ -265,7 +266,7 @@ export default class Session {
     }
 
     /**
-     * Fetches an ENT user from its id.
+     * Fetches an ENT user by id.
      * @param userId The id of the user
      */
     fetchUser(userId: string): Promise<User> {
