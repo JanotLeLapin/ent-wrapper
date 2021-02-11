@@ -169,7 +169,7 @@ export default class User {
             birthdate: this.birthdate,
             hobbies: this.hobbies,
         };
-    };
+    }
 
     /**
      * Sends a message to this user and returns the message id.
