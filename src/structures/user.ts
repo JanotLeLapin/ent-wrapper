@@ -1,5 +1,5 @@
 import Session from './session';
-import { IMessage, IMessageConfig } from './message';
+import { IMessageConfig } from './message';
 
 export interface IUserPreview {
     id: string;
