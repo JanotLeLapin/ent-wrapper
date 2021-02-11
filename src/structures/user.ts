@@ -67,6 +67,25 @@ export class UserPreview {
     }
 
     /**
+     * Sends a message to this user preview and returns the message id.
+     * @param config The configuration of the message
+     */
+    sendMessage(config: IMessageConfig): Promise<number> {
+        return new Promise<number>(async (resolve, reject) => {
+            try {
+                if (!this.session.authCookie) return reject('Missing auth cookie.');
+                const id = await this.session.sendMessage({
+                    ...config,
+                    to: [...(config.to || []), this.id],
+                });
+                resolve(id);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    /**
      * Fetches user from userpreview.
      */
     fetchUser(): Promise<User> {
