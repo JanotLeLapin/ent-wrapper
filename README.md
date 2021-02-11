@@ -9,12 +9,22 @@
     </p>
 </div>
 
-Ent Wrapper is a promise based wrapper for the Ent api. It takes an object-oriented approach, which makes the code easier to read.
+## About
 
-## Warning
-For now, this library has only been tested with the region ildedefrance. If your region does not work, feel free to open an issue.
+Ent Wrapper is a promise based wrapper for the Ent api. It takes an object-oriented approach, which makes the code easier to read.  
+For now, Ent Wrapper has only been tested with the region iledefrance. If your region is not supported, feel free to add an issue.
 
-## Example usage
+## Table of contents
+
+- [Example](#example)
+- [API](#api)
+  - [Session](#session)
+  - [Message](#message)
+  - [User](#user)
+  - [UserPreview](#userpreview)
+  - [App](#app)
+
+## Example
 ```ts
 const Ent = require('ent-wrapper');
 
@@ -38,77 +48,170 @@ const run = async () => {
 run();
 ```
 
-## Messages
+## API
 
-### Fetching messages
+### Session
+> The core Ent Wrapper class.
 
-```ts
-// Fetching every inbox messages at page 0
-const messages = await session.fetchMessages('Inbox', 0);
+**Session.prototype.login(url, username, password):Promise;**
+> Fetches a session cookie from the API. 
 
-// Getting the latest message
-const message = messages[0];
+Option   | Type   | Required | Default | Description
+---------|--------|----------|---------|------------
+url      | String | Yes      | -       | The ent url, depending on your region (eg: ent.iledefrance.fr)
+username | String | Yes      | -       | Your ENT username (usually firstname.lastname)
+password | String | Yes      | -       | Your ENT password
 
-// Fetching the body of the message and converting it from HTML to text
-const body = await message.fetchBody(true);
+Note that the client should be logged in before any other function is run.
 
-// Fetching the author of the message
-const author = await message.fetchAuthor();
+**Session.prototype.fetchLanguage():string;**
+> Fetches the user's preferred language. 
 
-// Logging the message
-console.log(`A message from ${author.displayName}:\n\nSubject: ${message.subject}\n${body}`);
-// A message from ARMEL Samuel:
+**Session.prototype.fetchMessages(folder, page):Promise;**
+> Fetches a list of [messages](#message) from the user.
 
-// Subject: Hello
-// Hey how are you
-```
+Option | Type   | Required | Default | Description
+-------|--------|----------|---------|------------
+folder | String | Yes      | -       | The system folder to fetch
+page   | Number | No       | 0       | The page of the folder to fetch
 
-### Sending messages
-```ts
-// Fetching an user
-const user = await session.fetchUser('user id');
+**Session.prototype.fetchMessage(messageId):Promise;**
+> Fetches a [message](#message)
 
-// Sending the user a message
-user.sendMessage({
-    subject: 'Hello',
-    body: `Hey there ${user.displayName}, just wanted to let you know you're a great person!`,
-    parseBody: true,
-    signature: 'JanotLeLapin',
-});
+Option    | Type   | Required | Default | Description
+----------|--------|----------|---------|------------
+messageId | Number | Yes      | -       | The id of the message
 
-// Or replying to a message
+**Session.prototype.fetchUserInfo():Promise;**
+> Fetches informations about the user
 
-// Fetching inbox messages
-const messages = await session.fetchMessages('Inbox', 0);
+**Session.prototype.fetchPinnedApps():Promise;**
+> Fetches the user's pinned [apps](#app)
 
-// Getting the latest message
-const message = messages[0];
+**Session.prototype.searchUsers({classes, functions, mood, profiles, search}):Promise;**
+> Searches for user profiles and returns an [UserPreview](#userpreview) array.
 
-// Replying to the message
-message.reply({
-    body: `The message you just sent, "${message.subject}", was very insightful.`,
-    parseBody: true,
-    signature: 'JanotLeLapin',
-});
+Option    | Type      | Required | Default | Description
+----------|-----------|----------|---------|------------
+classes   | String[]  | No       | -       | An array of classes id
+functions | String[]  | No       | -       | An array of functions id
+mood      | Boolean   | No       | -       | Not sure what this does
+profiles  | String[]  | No       | -       | An array of profiles (Student, Teacher...)
+search    | String    | No       | -       | The query
 
-// Or sending a message to multiple people
-session.sendMessage({
-    subject: 'Hello everyone',
-    body: 'How are you guys doing?',
-    parseBody: true,
-    to: ['user 1 id', 'user 2 id'],
-    signature: 'JanotLeLapin',
-});
-```
+**Session.prototype.fetchUser(userId):Promise;**
+> Fetches an ENT user by id.
 
-### Deleting messages
-```ts
-// Fetch sent messages
-const messages = await session.fetchMessages('Sent', 0);
+Option | Type   | Required | Default | Description
+-------|--------|----------|---------|------------
+userId | Number | Yes      | -       | The id of the user
 
-// Getting the latest message
-const message = messages[0];
+**Session.prototype.sendMessage({body, subject, parseBody, signature, attachments, cc, bcc, to}):Promise;**
+> Sends a message to a list of ENT users and returns the message id.
 
-// Deleting the message
-await message.moveToTrash();
-```
+Option      | Type      | Required | Default       | Description
+------------|-----------|----------|---------------|------------
+body        | String    | Yes      | -             | The body of the message
+subject     | String    | No       | (Aucun objet) | The subject of the message
+parseBody   | Boolean   | No       | false         | Wether the body of the message should be converted from text to HTML or not
+signature   | String    | No       | -             | The signature of the message
+attachments | String[]  | No       | -             | Not implemented yet
+cc          | String[]  | No       | -             | Array of cc users id
+bcc         | String[]  | No       | -             | Array of bcc users id
+to          | String[]  | No       | -             | Array of users id to send this message to
+
+### Message
+> The Ent Message class.
+
+**Message.prototype.toJSON():object**
+> Returns this message instance as a JSON object.
+
+**Message.prototype.fetchBody(parse):Promise**
+> Fetches the message body and marks the message as read.
+
+Option | Type    | Required | Default | Description
+-------|---------|----------|---------|------------
+parse  | Boolean | Yes      | -       | Wether the body should be decoded or not.
+
+**Message.prototype.fetchAuthor():Promise**
+> Fetches the [author](#user) of the message
+
+**Message.prototype.reply({body, subject, parseBody, signature, attachments, cc, bcc, to}):Promise**
+> Replies to this message and returns the reply's id.
+
+Option      | Type      | Required | Default                            | Description
+------------|-----------|----------|------------------------------------|------------
+body        | String    | Yes      | -                                  | The body of the message
+subject     | String    | No       | Re : *the subject of this message* | The subject of the message
+parseBody   | Boolean   | No       | false                              | Wether the body of the message should be converted from text to HTML or not
+signature   | String    | No       | -                                  | The signature of the message
+attachments | String[]  | No       | -                                  | Not implemented yet
+cc          | String[]  | No       | -                                  | Array of cc users id
+bcc         | String[]  | No       | -                                  | Array of bcc users id
+to          | String[]  | No       | -                                  | Array of users id to send this message to
+
+**Message.prototype.moveToTrash():Promise**
+> Moves the message to the trash folder.
+
+### User
+> The Ent User class.
+
+**User.prototype.toJSON():object**
+> Returns this user instance as a JSON object.
+
+**User.prototype.sendMessage({body, subject, parseBody, signature, attachments, cc, bcc, to}):Promise**
+> Sends a message to this user and returns the message id.
+
+Option      | Type      | Required | Default       | Description
+------------|-----------|----------|---------------|------------
+body        | String    | Yes      | -             | The body of the message
+subject     | String    | No       | (Aucun objet) | The subject of the message
+parseBody   | Boolean   | No       | false         | Wether the body of the message should be converted from text to HTML or not
+signature   | String    | No       | -             | The signature of the message
+attachments | String[]  | No       | -             | Not implemented yet
+cc          | String[]  | No       | -             | Array of cc users id
+bcc         | String[]  | No       | -             | Array of bcc users id
+to          | String[]  | No       | -             | Array of additionnal users id to send this message to
+
+**User.prototype.avatarURL():string**
+> Returns the users avatar url.
+
+### UserPreview
+> The Ent UserPreview class, similar to the User class but with some missing properties.
+
+**UserPreview.prototype.toJSON():object**
+> Returns this user instance as a JSON object.
+
+**UserPreview.prototype.sendMessage({body, subject, parseBody, signature, attachments, cc, bcc, to}):Promise**
+> Sends a message to this user and returns the message id.
+
+Option      | Type      | Required | Default       | Description
+------------|-----------|----------|---------------|------------
+body        | String    | Yes      | -             | The body of the message
+subject     | String    | No       | (Aucun objet) | The subject of the message
+parseBody   | Boolean   | No       | false         | Wether the body of the message should be converted from text to HTML or not
+signature   | String    | No       | -             | The signature of the message
+attachments | String[]  | No       | -             | Not implemented yet
+cc          | String[]  | No       | -             | Array of cc users id
+bcc         | String[]  | No       | -             | Array of bcc users id
+to          | String[]  | No       | -             | Array of additionnal users id to send this message to
+
+**UserPreview.prototype.fetchUser():Promise**
+> Fetches user from userpreview.
+
+**UserPreview.prototype.avatarURL():string**
+> Returns the users avatar url.
+
+### App
+
+**App.prototype.toJSON():object**
+> Returns this app instance as a JSON object.
+
+**App.prototype.fullAddress():string**
+> Returns the full address of the map.
+
+**App.prototype.pin():Promise**
+> Pins the app.
+
+**App.prototype.unpin():Promise**
+> Unpins the app.
