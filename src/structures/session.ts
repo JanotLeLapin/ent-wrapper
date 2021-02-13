@@ -7,7 +7,7 @@ import App from './app';
 
 import { encodeUrl, processCookies, error } from '../util';
 
-export interface IUser {
+export interface IUserInfo {
     classNames:          string[];
     level:               string;
     login:               string;
@@ -198,8 +198,8 @@ export default class Session {
     /**
      * Fetches informations about the user.
      */
-    fetchUserInfo(): Promise<IUser> {
-        return new Promise<IUser>(async (resolve, reject) => {
+    fetchUserInfo(): Promise<IUserInfo> {
+        return new Promise<IUserInfo>(async (resolve, reject) => {
             try {
                 if (!this.authCookie) return reject('Missing auth cookie.');
                 const res = await fetch(this.url + 'auth/oauth2/userinfo', {
