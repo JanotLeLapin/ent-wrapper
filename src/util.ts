@@ -2,7 +2,9 @@
  * Encodes string to an url.
  * @param str The string to encode
  */
-export const encodeUrl = (str: string) => encodeURIComponent(str).replace(/!/g, '%21')
+export const encodeUrl = (str: string) =>
+  encodeURIComponent(str)
+    .replace(/!/g, '%21')
     .replace(/'/g, '%27')
     .replace(/\(/g, '%28')
     .replace(/\)/g, '%29')
@@ -15,19 +17,20 @@ export const encodeUrl = (str: string) => encodeURIComponent(str).replace(/!/g, 
  * @param reject The promise reject function
  */
 export const error = (res: any, reject: (reason: any) => void) => {
-    if (res.error) {
-        try {
-            reject(JSON.parse(res.error));
-        } catch {
-            reject(res.error);
-        }
-        return true;
+  if (res.error) {
+    try {
+      reject(JSON.parse(res.error));
+    } catch {
+      reject(res.error);
     }
-    return false;
+    return true;
+  }
+  return false;
 };
 
 /**
  * Processes cookies and returns them.
  * @param cookies The cookies
  */
-export const processCookies = (cookies: string[]) => cookies.map(cookie => cookie.split('; ')[0]).join('; ');
+export const processCookies = (cookies: string[]) =>
+  cookies.map((cookie) => cookie.split('; ')[0]).join('; ');
