@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { htmlToText } from 'html-to-text';
+import { htmlToText } from '../util';
 
 import Session from './session';
 import User from './user';
