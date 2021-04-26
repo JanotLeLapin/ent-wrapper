@@ -1,0 +1,28 @@
+.Header {
+  background-color: var(--main-3);
+  padding: 0.5rem 1.5rem;
+}
+
+.Install {
+  display: flex;
+  justify-content: center;
+  font-size: larger;
+  margin: 4rem;
+}
+
+.Articles {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.Articles > div {
+  max-width: 600px;
+  margin: 2rem;
+}
+.Articles h1 {
+  text-align: center;
+}
+.Articles p {
+  text-align: justify;
+  line-height: 2rem;
+}
