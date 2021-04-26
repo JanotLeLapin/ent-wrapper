@@ -1,31 +1,32 @@
 {
-    "name": "ent-wrapper",
-    "version": "1.0.3",
-    "description": "A wrapper for the ent api written in TypeScript",
-    "keywords": [
-        "ent",
-        "api",
-        "client",
-        "promise",
-        "node"
-    ],
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "repository": "https://github.com/JanotLeLapin/ent-wrapper.git",
-    "author": "JanotLeLapin <joseph300905@gmail.com>",
-    "license": "MIT",
-    "scripts": {
-        "start": "node dist",
-        "debug": "nodemon dist/index.test.js",
-        "clean": "rm -r dist"
-    },
-    "dependencies": {
-        "node-fetch": "^2.6.1"
-    },
-    "devDependencies": {
-        "@types/node": "^14.14.25",
-        "@types/node-fetch": "^2.5.8",
-        "nodemon": "^2.0.7",
-        "typescript": "^4.1.3"
-    }
+  "name": "ent-wrapper",
+  "version": "1.0.3",
+  "description": "A wrapper for the ent api written in TypeScript",
+  "keywords": [
+    "ent",
+    "api",
+    "client",
+    "promise",
+    "node"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/JanotLeLapin/ent-wrapper.git",
+  "author": "JanotLeLapin <joseph300905@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node dist",
+    "debug": "nodemon dist/index.test.js",
+    "clean": "rm -r dist",
+    "deploy": "tsc && yarn publish"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.25",
+    "@types/node-fetch": "^2.5.8",
+    "nodemon": "^2.0.7",
+    "typescript": "^4.1.3"
+  }
 }
