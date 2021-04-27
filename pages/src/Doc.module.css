@@ -1,0 +1,18 @@
+.MethodDef {
+  margin: 0 0 2rem 2rem;
+}
+
+.ParamsWrapper {
+  margin-top: 1rem;
+}
+.Params {
+  width: auto;
+}
+
+.Returns {
+  display: flex;
+  align-items: center;
+}
+.Returns > * {
+  margin-right: 0.5rem;
+}
