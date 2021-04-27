@@ -30,6 +30,27 @@ a:hover {
   color: var(--main-1);
 }
 
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+table {
+  background-color: var(--dark-2);
+  border-collapse: collapse;
+  border-radius: 0.4rem;
+  overflow: hidden;
+}
+tr:first-child {
+  background-color: var(--main-3);
+}
+th {
+  padding: 0.5rem 1.5rem;
+}
+td {
+  padding: 1rem 1.5rem;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
