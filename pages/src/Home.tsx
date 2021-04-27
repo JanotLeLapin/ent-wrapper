@@ -26,10 +26,7 @@ const example = [
 ];
 
 const App = () => (
-  <div className="App">
-    <header className={styles.Header}>
-      <h1>Ent Wrapper</h1>
-    </header>
+  <div>
     <div className={styles.Install}>
       <Code language="bash">{'> npm install ent-wrapper'}</Code>
     </div>

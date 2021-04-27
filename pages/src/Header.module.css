@@ -1,0 +1,22 @@
+.Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  background-color: var(--main-3);
+  padding: 0.5rem 1.5rem;
+}
+
+.Links {
+  display: flex;
+  align-items: center;
+  margin: 0 1rem;
+}
+.Links * {
+  color: var(--light-3);
+  margin: 0 1rem;
+  transition: 0.15s ease-in-out;
+}
+.Links *:hover {
+  cursor: pointer;
+  color: var(--light-1);
+}
