@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-import Session from './session';
+import { Session } from './session';
 
 import { error } from '../util';
 
@@ -19,7 +19,7 @@ export interface IApp {
   scope: scope[];
 }
 
-export default class App {
+export class App {
   session: Session;
 
   name: string;

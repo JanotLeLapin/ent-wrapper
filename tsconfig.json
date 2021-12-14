@@ -1,17 +1,30 @@
 {
-    "compilerOptions": {
-        "target": "ES5",
-        "declaration": true,
-        "outDir": "dist",
-        "module": "CommonJS",
-        "esModuleInterop": true,
-        "strict": true,
-        "skipLibCheck": true
-    },
-    "include": [
-        "./src/**/*"
-    ],
-    "exclude": [
-        "./node_modules"
-    ]
+  "compilerOptions": {
+    "incremental": true,
+    "target": "ES5",
+    "outDir": "dist",
+    "rootDir": "src",
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "declaration": true,
+    "inlineSourceMap": true,
+    "esModuleInterop": true,
+
+    "strict": true,
+
+    "noUnusedLocals": true /* Report errors on unused locals. */,
+    "noUnusedParameters": true /* Report errors on unused parameters. */,
+    "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+    "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
+
+    "traceResolution": false,
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "pretty": true,
+
+    "lib": ["ES5"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules/**"],
+  "compileOnSave": false
 }

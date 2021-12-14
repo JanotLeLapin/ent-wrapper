@@ -5,7 +5,9 @@
         <h3>A wrapper for the Ent api written in Typescript.</h3>
     </p>
     <p>
-        <a href="https://nodei.co/npm/ent-wrapper/"><img src="https://nodei.co/npm/ent-wrapper.png?downloads=true&stars=true" alt="npm installnfo" /></a>
+        <a href="https://nodei.co/npm/ent-wrapper/">
+          <img src="https://nodei.co/npm/ent-wrapper.png?downloads=true&stars=true" alt="npm installnfo" />
+        </a>
     </p>
 </div>
 
@@ -21,20 +23,22 @@ For now, Ent Wrapper has only been tested with the region iledefrance. If your r
 
 ## Example
 
-```ts
+```js
 const Ent = require('ent-wrapper');
 
 const run = async () => {
   try {
-    const session = new Ent.Session();
+    // Create a session
+    const session = new Ent.Session(
+      'ent.iledefrance.fr',
+      'firstname.lastname',
+      'password'
+    );
 
-    // Logging in
-    await session.login('ent.iledefrance.fr', 'firstname.lastname', 'password');
-
-    // Fetching user informations
+    // Fetch user informations
     const userInfo = await session.fetchUserInfo();
 
-    // Logging user level
+    // Log user level
     console.log(userInfo.level); // SECONDE GENERALE & TECHNO
   } catch (err) {
     console.error(err);

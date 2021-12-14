@@ -1,8 +1,8 @@
 import fetch from 'node-fetch';
 import { htmlToText } from '../util';
 
-import Session from './session';
-import User from './user';
+import { Session } from './session';
+import { User } from './user';
 
 import { error } from '../util';
 
@@ -37,7 +37,7 @@ export interface IMessageConfig {
   to?: string[];
 }
 
-export default class Message {
+export class Message {
   session: Session;
 
   attachments: any[];

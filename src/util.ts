@@ -66,10 +66,3 @@ export const error = (res: any, reject: (reason: any) => void) => {
   }
   return false;
 };
-
-/**
- * Processes cookies and returns them.
- * @param cookies The cookies
- */
-export const processCookies = (cookies: string[]) =>
-  cookies.map((cookie) => cookie.split('; ')[0]).join('; ');

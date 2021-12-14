@@ -1,11 +1,11 @@
 import fetch from 'node-fetch';
 import https from 'https';
 
-import Message, { IMessageConfig } from './message';
-import User, { UserPreview, profile } from './user';
-import App from './app';
+import { Message, IMessageConfig } from './message';
+import { User, UserPreview, profile } from './user';
+import { App } from './app';
 
-import { encodeUrl, processCookies, error } from '../util';
+import { encodeUrl, error, htmlToText } from '../util';
 
 export interface IUserInfo {
   classNames: string[];
@@ -69,10 +69,16 @@ export interface IQuery {
   search?: string;
 }
 
-export default class Session {
+export class Session {
   authCookie?: string;
   xsrf?: string;
   url?: string;
+
+  constructor(url: string, private username: string, private password: string) {
+    this.url =
+      (url.startsWith('https://') ? url : 'https://' + url) +
+      (url.endsWith('/') ? '' : '/');
+  }
 
   /**
    * Fetches a session cookie from the API.
@@ -80,14 +86,11 @@ export default class Session {
    * @param username Your ENT username (usually firstname.lastname)
    * @param password Your ENT password
    */
-  login(url: string, username: string, password: string): Promise<void> {
-    this.url =
-      (url.startsWith('https://') ? url : 'https://' + url) +
-      (url.endsWith('/') ? '' : '/');
+  private login(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
-        const data = `email=${username}&password=${encodeUrl(
-          password
+        const data = `email=${this.username}&password=${encodeUrl(
+          this.password
         )}&callBack=https%253A%252F%252Fent.iledefrance.fr%252Ftimeline%252Ftimeline&details=`;
         const req0 = https.request(
           {
@@ -100,43 +103,51 @@ export default class Session {
               Connection: 'keep-alive',
               'Content-Type': 'application/x-www-form-urlencoded',
               'Content-Length': data.length,
-              'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 OPR/73.0.3856.344',
             },
           },
           (res0) => {
             res0.destroy();
-            if (res0.statusCode === 200 || !res0.headers['set-cookie'])
-              return reject('Auth failed.');
-            this.authCookie = processCookies([...res0.headers['set-cookie']]);
-            const req1 = https.request(
-              {
-                hostname: 'ent.iledefrance.fr',
-                path: '/timeline/timeline',
-                method: 'GET',
-                headers: {
-                  Accept: '*/*',
-                  'Accept-Encoding': 'gzip, deflate, br',
-                  Cookie: processCookies(res0.headers['set-cookie']),
-                  'User-Agent':
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 OPR/73.0.3856.344',
-                },
-              },
-              (res1) => {
-                res1.destroy();
-                if (!res1.headers['set-cookie']) return reject('Auth failed.');
-                this.xsrf = res1.headers['set-cookie']
-                  .find((cookie) => cookie.includes('XSRF'))
-                  ?.split('=')[1]
-                  ?.split(';')[0];
-                resolve();
-              }
+            let cookies = res0.headers['set-cookie'];
+            if (res0.statusCode === 200 || !cookies)
+              return reject(new Error('Auth failed.'));
+
+            cookies = cookies.map((cookie) => cookie.split(';')[0]);
+            this.xsrf = cookies
+              .find((cookie) => cookie.startsWith('XSRF-TOKEN'))
+              ?.split('=')[1];
+            this.authCookie = cookies.find((cookie) =>
+              cookie.startsWith('oneSessionId')
             );
-            req1.end();
+            resolve();
           }
         );
         req0.write(data);
         req0.end();
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  fetch(path: string, body?: string, method?: string): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        if (!this.authCookie) await this.login();
+
+        const res = await fetch(this.url + path, {
+          headers: {
+            Cookie: `${this.authCookie}; XSRF-TOKEN=${this.xsrf}`,
+            'X-XSRF-TOKEN': this.xsrf as string,
+          },
+          method: method ? method : 'GET',
+          body: body ? body : undefined,
+        });
+
+        const json = await res.json();
+        if (error(json, reject))
+          return reject(new Error('Could not fetch data.'));
+
+        resolve(json);
       } catch (err) {
         reject(err);
       }
@@ -149,14 +160,7 @@ export default class Session {
   fetchLanguage(): Promise<string> {
     return new Promise<string>(async (resolve, reject) => {
       try {
-        if (!this.authCookie) return reject('Missing auth cookie.');
-        const res = await fetch(this.url + 'userbook/preference/language', {
-          headers: {
-            Cookie: this.authCookie,
-          },
-        });
-        const json = await res.json();
-        if (error(json, reject)) return;
+        const json = await this.fetch('userbook/preference/language');
         resolve(JSON.parse(json.preference)['default-domain']);
       } catch (err) {
         reject(err);
@@ -175,24 +179,12 @@ export default class Session {
   ): Promise<Message[]> {
     return new Promise<Message[]>(async (resolve, reject) => {
       try {
-        if (!this.authCookie) return reject('Missing auth cookie.');
         if (!['Inbox', 'Sent', 'Drafts', 'Trash'].includes(folder))
-          return reject('Invalid folder.');
-        const res = await fetch(
-          this.url +
-            'zimbra/list?folder=' +
-            folder +
-            '&page=' +
-            page +
-            '&unread=false',
-          {
-            headers: {
-              Cookie: this.authCookie,
-            },
-          }
+          return reject(new Error('Invalid folder'));
+
+        const json: any[] = await this.fetch(
+          `zimbra/list?folder=${folder}&page=${page}&unread=false`
         );
-        const json: any[] = await res.json();
-        if (error(json, reject)) return;
         resolve(
           json.map((message) => new Message({ ...message, session: this }))
         );
@@ -205,19 +197,19 @@ export default class Session {
   /**
    * Fetches a message.
    * @param messageId The id of the message
+   * @param parse Whether the body should be decoded
    */
-  fetchMessage(messageId: number): Promise<Message> {
+  fetchMessage(messageId: number, parse?: boolean): Promise<Message> {
     return new Promise<Message>(async (resolve, reject) => {
       try {
-        if (!this.authCookie) return reject('Missing auth cookie.');
-        const res = await fetch(this.url + 'zimbra/message/' + messageId, {
-          headers: {
-            Cookie: this.authCookie,
-          },
-        });
-        const json = await res.json();
-        if (error(json, reject)) return;
-        resolve(new Message({ ...json, session: this }));
+        const json = await this.fetch(`zimbra/message/${messageId}`);
+        resolve(
+          new Message({
+            ...json,
+            body: parse ? htmlToText(json.body) : json.body,
+            session: this,
+          })
+        );
       } catch (err) {
         reject(err);
       }
@@ -230,14 +222,7 @@ export default class Session {
   fetchUserInfo(): Promise<IUserInfo> {
     return new Promise<IUserInfo>(async (resolve, reject) => {
       try {
-        if (!this.authCookie) return reject('Missing auth cookie.');
-        const res = await fetch(this.url + 'auth/oauth2/userinfo', {
-          headers: {
-            Cookie: this.authCookie,
-          },
-        });
-        const json = await res.json();
-        if (error(json, reject)) return;
+        const json = await this.fetch('auth/oauth2/userinfo');
         const tempDate = json.birthDate.split('-');
         resolve({
           ...json,
@@ -256,15 +241,7 @@ export default class Session {
   fetchPinnedApps(): Promise<App[]> {
     return new Promise<App[]>(async (resolve, reject) => {
       try {
-        if (!this.authCookie) return reject('Missing auth cookie.');
-        const res = await fetch(this.url + 'userbook/preference/apps', {
-          headers: {
-            Cookie: this.authCookie,
-          },
-        });
-        const json = await res.json();
-        if (error(json, reject)) return;
-
+        const json = await this.fetch('userbook/preference/apps');
         const parsed: any[] = JSON.parse(json.preference);
         resolve(parsed.map((app) => new App({ ...app, session: this })));
       } catch (err) {
@@ -280,18 +257,11 @@ export default class Session {
   searchUsers(query: IQuery): Promise<UserPreview[]> {
     return new Promise<UserPreview[]>(async (resolve, reject) => {
       try {
-        if (!this.authCookie || !this.xsrf)
-          return reject('Missing auth cookie.');
-        const res = await fetch(this.url + 'communication/visible', {
-          headers: {
-            Cookie: this.authCookie,
-            'X-XSRF-TOKEN': this.xsrf,
-          },
-          method: 'POST',
-          body: JSON.stringify(query),
-        });
-        const json: { users: any[] } = await res.json();
-        if (error(json, reject)) return;
+        const json: { users: any[] } = await this.fetch(
+          'communication/visible',
+          JSON.stringify(query),
+          'POST'
+        );
         resolve(
           json.users.map(
             (userpreview) => new UserPreview({ ...userpreview, session: this })
@@ -310,14 +280,7 @@ export default class Session {
   fetchUser(userId: string): Promise<User> {
     return new Promise<User>(async (resolve, reject) => {
       try {
-        if (!this.authCookie) return reject('Missing auth cookie.');
-        const res = await fetch(this.url + 'userbook/api/person?id=' + userId, {
-          headers: {
-            Cookie: this.authCookie,
-          },
-        });
-        const json = await res.json();
-        if (error(json, reject)) return;
+        const json = await this.fetch('userbook/api/person?id=' + userId);
         resolve(new User({ ...json.result[0], session: this }));
       } catch (err) {
         reject(err);
@@ -332,7 +295,6 @@ export default class Session {
   sendMessage(config: IMessageConfig): Promise<number> {
     return new Promise<number>(async (resolve, reject) => {
       try {
-        if (!this.authCookie) return reject('Missing auth cookie.');
         if (!config.to) return reject('No destination specified.');
 
         const message = JSON.stringify({
@@ -353,26 +315,14 @@ export default class Session {
           to: config.to,
         });
 
-        const res = await fetch(this.url + 'zimbra/draft', {
-          headers: {
-            Cookie: this.authCookie,
-          },
-          method: 'POST',
-          body: message,
-        });
-        const json = await res.json();
-        if (error(json, reject)) return;
-        const id = json.id;
+        const draftJson = await this.fetch('zimbra/draft', message, 'POST');
+        const id = draftJson.id;
 
-        const sendRes = await fetch(this.url + 'zimbra/send?id=' + id, {
-          headers: {
-            Cookie: this.authCookie,
-          },
-          method: 'POST',
-          body: message,
-        });
-        const sendJson = await sendRes.json();
-        if (error(sendJson, reject)) return;
+        const sendJson = await this.fetch(
+          `zimbra/send?id=${id}`,
+          message,
+          'POST'
+        );
         resolve(sendJson.id);
       } catch (err) {
         reject(err);
