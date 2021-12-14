@@ -1,6 +1,6 @@
 {
   "name": "ent-wrapper",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "A wrapper for the ent api written in TypeScript",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

@@ -1,10 +1,7 @@
-import fetch from 'node-fetch';
 import { htmlToText } from '../util';
 
 import { Session } from './session';
 import { User } from './user';
-
-import { error } from '../util';
 
 export interface IMessage {
   attachments: any[];
@@ -112,18 +109,9 @@ export class Message {
   fetchBody(parse: boolean): Promise<string> {
     return new Promise<string>(async (resolve, reject) => {
       try {
-        if (!this.session.authCookie) return reject('Missing auth cookie.');
-        if (this.body) return resolve(this.body);
-        const res = await fetch(
-          this.session.url + 'zimbra/message/' + this.id,
-          {
-            headers: {
-              Cookie: this.session.authCookie,
-            },
-          }
-        );
-        const json = await res.json();
-        if (error(json, reject)) return;
+        if (this.body)
+          return resolve(parse ? htmlToText(this.body) : this.body);
+        const json = await this.session.fetch(`zimbra/message/${this.id}`);
         resolve(parse ? htmlToText(json.body) : json.body);
       } catch (err) {
         reject(err);
@@ -137,7 +125,6 @@ export class Message {
   fetchAuthor(): Promise<User> {
     return new Promise<User>(async (resolve, reject) => {
       try {
-        if (!this.session.authCookie) return reject('Missing auth cookie.');
         const user = await this.session.fetchUser(this.from);
         resolve(user);
       } catch (err) {
@@ -153,8 +140,6 @@ export class Message {
   reply(config: IMessageConfig): Promise<number> {
     return new Promise<number>(async (resolve, reject) => {
       try {
-        if (!this.session.authCookie) return reject('Missing auth cookie.');
-
         const currentUserInfo = await this.session.fetchUserInfo();
 
         const message = JSON.stringify({
@@ -190,35 +175,19 @@ export class Message {
           to: [this.from],
         });
 
-        const res = await fetch(
-          this.session.url +
-            'zimbra/draft?In-Reply-To=' +
-            this.id +
-            '&reply=undefined',
-          {
-            headers: {
-              Cookie: this.session.authCookie,
-            },
-            method: 'POST',
-            body: message,
-          }
+        const draftJson = await this.session.fetch(
+          `zimbra/draft?In-Reply-To=${this.id}
+            &reply=undefined`,
+          message,
+          'POST'
         );
-        const json = await res.json();
-        if (error(json, reject)) return;
-        const id = json.id;
+        const id = draftJson.id;
 
-        const sendRes = await fetch(
-          this.session.url + 'zimbra/send?id=' + id + '&In-Reply-To=' + this.id,
-          {
-            headers: {
-              Cookie: this.session.authCookie,
-            },
-            method: 'POST',
-            body: message,
-          }
+        const sendJson = await this.session.fetch(
+          `zimbra/send?id=${id}&In-Reply-To=${this.id}`,
+          message,
+          'POST'
         );
-        const sendJson = await sendRes.json();
-        if (error(sendJson, reject)) return;
         resolve(sendJson.id);
       } catch (err) {
         reject(err);
@@ -232,20 +201,11 @@ export class Message {
   moveToTrash(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
-        if (!this.session.authCookie) return reject('Missing auth cookie.');
-
-        const res = await fetch(
-          this.session.url + 'zimbra/trash?id=' + this.id,
-          {
-            headers: {
-              Cookie: this.session.authCookie,
-            },
-            method: 'PUT',
-          }
+        await this.session.fetch(
+          `zimbra/trash?id=${this.id}`,
+          undefined,
+          'PUT'
         );
-        const json = await res.json();
-        if (error(json, reject)) return;
-
         resolve();
       } catch (err) {
         reject(err);

@@ -1,8 +1,4 @@
-import fetch from 'node-fetch';
-
 import { Session } from './session';
-
-import { error } from '../util';
 
 export type target = '_blank' | '';
 export type scope = '' | 'myinfos' | 'userinfo';
@@ -70,64 +66,5 @@ export class App {
     return this.address.startsWith('/')
       ? this.session.url + this.address.substring(1)
       : this.address;
-  }
-
-  /**
-   * Pins this app.
-   */
-  pin(): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
-      try {
-        if (!this.session.authCookie || !this.session.xsrf)
-          return reject('Missing auth cookie.');
-        const apps = await this.session.fetchPinnedApps();
-        const res = await fetch(this.session.url + 'userbook/preference/apps', {
-          headers: {
-            Cookie: this.session.authCookie,
-            'X-XSRF-TOKEN': this.session.xsrf,
-          },
-          method: 'PUT',
-          body: JSON.stringify([
-            ...apps.map((app) => app.toJSON()),
-            this.toJSON(),
-          ]),
-        });
-        const json = await res.json();
-        if (error(json, reject)) return;
-        resolve();
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
-  /**
-   * Unpins this app.
-   */
-  unpin(): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
-      try {
-        if (!this.session.authCookie || !this.session.xsrf)
-          return reject('Missing auth cookie.');
-        const apps = await this.session.fetchPinnedApps();
-        const res = await fetch(this.session.url + 'userbook/preference/apps', {
-          headers: {
-            Cookie: this.session.authCookie,
-            'X-XSRF-TOKEN': this.session.xsrf,
-          },
-          method: 'PUT',
-          body: JSON.stringify(
-            apps
-              .filter((app) => app.name !== this.name)
-              .map((app) => app.toJSON())
-          ),
-        });
-        const json = await res.json();
-        if (error(json, reject)) return;
-        resolve();
-      } catch (err) {
-        reject(err);
-      }
-    });
   }
 }

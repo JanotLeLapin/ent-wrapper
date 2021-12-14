@@ -238,12 +238,11 @@ export class Session {
   /**
    * Fetches the user's pinned apps.
    */
-  fetchPinnedApps(): Promise<App[]> {
-    return new Promise<App[]>(async (resolve, reject) => {
+  fetchPinnedApps(): Promise<string[]> {
+    return new Promise<string[]>(async (resolve, reject) => {
       try {
         const json = await this.fetch('userbook/preference/apps');
-        const parsed: any[] = JSON.parse(json.preference);
-        resolve(parsed.map((app) => new App({ ...app, session: this })));
+        resolve(JSON.parse(json.preference).bookmarks);
       } catch (err) {
         reject(err);
       }
