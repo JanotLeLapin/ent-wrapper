@@ -13,23 +13,31 @@ export interface IApp {
   prefix?: string;
   casType?: string;
   scope: scope[];
+  isExternal: boolean;
 }
 
 export class App {
   session: Session;
 
+  /** The code name of the app */
   name: string;
+  /** The app uri path */
   address: string;
   icon: string;
+  /** Html link target */
   target?: target;
+  /** The display name of the app */
   displayName: string;
+  /** Whether the end user should see this app */
   display: boolean;
   prefix?: string;
   casType?: string;
   scope: scope[];
+  /** Whether this is a third-party app */
+  isExternal: boolean;
 
-  constructor(data: any) {
-    this.session = data.session;
+  constructor(data: any, session: Session) {
+    this.session = session;
 
     this.name = data.name;
     this.address = data.address;
@@ -40,6 +48,7 @@ export class App {
     this.prefix = data.prefix;
     this.casType = data.casType;
     this.scope = data.scope;
+    this.isExternal = data.isExternal;
   }
 
   /** Returns this app as a JSON object */
@@ -54,6 +63,7 @@ export class App {
       prefix: this.prefix,
       casType: this.casType,
       scope: this.scope,
+      isExternal: this.isExternal,
     };
   }
 

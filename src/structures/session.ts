@@ -218,8 +218,20 @@ export class Session {
         resolve({
           ...json,
           birthDate: new Date(tempDate[0], tempDate[1] - 1, tempDate[2]),
-          apps: json.apps.map((app: any) => new App({ ...app, session: this })),
+          apps: json.apps.map((app: any) => new App(app, this)),
         });
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  /** Fetch the application list */
+  fetchApps(): Promise<App[]> {
+    return new Promise<App[]>(async (resolve, reject) => {
+      try {
+        const { apps }: { apps: any[] } = await this.fetch('applications-list');
+        resolve(apps.map((app) => new App(app, this)));
       } catch (err) {
         reject(err);
       }
