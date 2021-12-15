@@ -18,7 +18,7 @@
     "build": "tsc -p tsconfig.json",
     "clean": "rm -r dist",
     "docs": "typedoc --entryPointStrategy expand ./src --exclude \"**/*+(index|util).ts\"",
-    "publish": "gh-pages -m \"[ci skip] Updates\" -d docs"
+    "docs:publish": "gh-pages -m \"[ci skip] Updates\" -d docs"
   },
   "dependencies": {
     "node-fetch": "^2.6.1"
