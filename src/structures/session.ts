@@ -5,7 +5,7 @@ import { Message, IMessageConfig } from './message';
 import { User, UserPreview, profile } from './user';
 import { App } from './app';
 
-import { encodeUrl, error, htmlToText } from '../util';
+import { encodeUrl, error } from '../util';
 
 export interface IUserInfo {
   classNames: string[];
@@ -80,12 +80,7 @@ export class Session {
       (url.endsWith('/') ? '' : '/');
   }
 
-  /**
-   * Fetches a session cookie from the API.
-   * @param url The ent url, depending on your region (eg: ent.iledefrance.fr)
-   * @param username Your ENT username (usually firstname.lastname)
-   * @param password Your ENT password
-   */
+  /** Fetches a session cookie from the API */
   private login(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
@@ -154,9 +149,7 @@ export class Session {
     });
   }
 
-  /**
-   * Fetches the user's preferred language.
-   */
+  /** Fetches the user's preferred language */
   fetchLanguage(): Promise<string> {
     return new Promise<string>(async (resolve, reject) => {
       try {
@@ -169,7 +162,7 @@ export class Session {
   }
 
   /**
-   * Fetches a list of messages from the user.
+   * Fetches a list of messages from the user
    * @param folder The system folder to fetch
    * @param page The messages page
    */
@@ -195,18 +188,18 @@ export class Session {
   }
 
   /**
-   * Fetches a message.
+   * Fetches a message from its id
    * @param messageId The id of the message
    * @param parse Whether the body should be decoded
    */
-  fetchMessage(messageId: number, parse?: boolean): Promise<Message> {
+  fetchMessage(messageId: number): Promise<Message> {
     return new Promise<Message>(async (resolve, reject) => {
       try {
         const json = await this.fetch(`zimbra/message/${messageId}`);
         resolve(
           new Message({
             ...json,
-            body: parse ? htmlToText(json.body) : json.body,
+            body: json.body,
             session: this,
           })
         );
@@ -216,9 +209,7 @@ export class Session {
     });
   }
 
-  /**
-   * Fetches informations about the user.
-   */
+  /** Fetches informations about the current user */
   fetchUserInfo(): Promise<IUserInfo> {
     return new Promise<IUserInfo>(async (resolve, reject) => {
       try {
@@ -235,9 +226,7 @@ export class Session {
     });
   }
 
-  /**
-   * Fetches the user's pinned apps.
-   */
+  /** Fetches the user's pinned apps */
   fetchPinnedApps(): Promise<string[]> {
     return new Promise<string[]>(async (resolve, reject) => {
       try {
@@ -250,7 +239,7 @@ export class Session {
   }
 
   /**
-   * Searches for user profiles and returns an UserPreview array.
+   * Searches for user profiles and returns an UserPreview array
    * @param query The query
    */
   searchUsers(query: IQuery): Promise<UserPreview[]> {
@@ -273,7 +262,7 @@ export class Session {
   }
 
   /**
-   * Fetches an ENT user by id.
+   * Fetches an ENT user by id
    * @param userId The id of the user
    */
   fetchUser(userId: string): Promise<User> {
@@ -288,7 +277,7 @@ export class Session {
   }
 
   /**
-   * Sends a message to a list of ENT users and returns the message id.
+   * Sends a message to a list of ENT users and returns the message id
    * @param config The configuration of the message
    */
   sendMessage(config: IMessageConfig): Promise<number> {

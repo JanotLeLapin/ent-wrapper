@@ -42,9 +42,7 @@ export class App {
     this.scope = data.scope;
   }
 
-  /**
-   * Returns this app instance as a JSON object.
-   */
+  /** Returns this app as a JSON object */
   toJSON(): IApp {
     return {
       name: this.name,
@@ -59,9 +57,7 @@ export class App {
     };
   }
 
-  /**
-   * Returns the full address of the app.
-   */
+  /** Returns the full address of the app */
   fullAddress() {
     return this.address.startsWith('/')
       ? this.session.url + this.address.substring(1)

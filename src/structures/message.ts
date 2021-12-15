@@ -77,9 +77,7 @@ export class Message {
     this.body = data.body;
   }
 
-  /**
-   * Returns this message instance as a JSON object.
-   */
+  /** Returns this message as a JSON object */
   toJSON(): IMessage {
     return {
       attachments: this.attachments,
@@ -103,7 +101,7 @@ export class Message {
   }
 
   /**
-   * Fetches the message body and marks the message as read.
+   * Fetches the message body and marks the message as read
    * @param parse Wether the body should be decoded or not
    */
   fetchBody(parse: boolean): Promise<string> {
@@ -112,16 +110,17 @@ export class Message {
         if (this.body)
           return resolve(parse ? htmlToText(this.body) : this.body);
         const json = await this.session.fetch(`zimbra/message/${this.id}`);
-        resolve(parse ? htmlToText(json.body) : json.body);
+        const body = json.body;
+
+        this.body = body;
+        resolve(parse ? htmlToText(body) : body);
       } catch (err) {
         reject(err);
       }
     });
   }
 
-  /**
-   * Fetches the author of the message.
-   */
+  /** Fetches the author of the message */
   fetchAuthor(): Promise<User> {
     return new Promise<User>(async (resolve, reject) => {
       try {
@@ -134,7 +133,7 @@ export class Message {
   }
 
   /**
-   * Replies to this message and returns the reply's id.
+   * Replies to this message and returns the reply's id
    * @param config The configuration of the message
    */
   reply(config: IMessageConfig): Promise<number> {
@@ -195,9 +194,7 @@ export class Message {
     });
   }
 
-  /**
-   * Moves the message to the trash folder.
-   */
+  /** Moves the message to the trash folder */
   moveToTrash(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
