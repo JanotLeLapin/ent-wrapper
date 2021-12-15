@@ -64,8 +64,8 @@ export class UserPreview {
   /** The profile of the user (eg. Student, Teacher...) */
   profile: profile;
 
-  constructor(data: any) {
-    this.session = data.session;
+  constructor(data: any, session: Session) {
+    this.session = session;
 
     this.id = data.id;
     this.displayName = data.displayName;
@@ -157,8 +157,8 @@ export class User {
   /** The hobbies of the user */
   hobbies: IHobby[];
 
-  constructor(data: any) {
-    this.session = data.session;
+  constructor(data: any, session: Session) {
+    this.session = session;
 
     this.id = data.id;
     this.login = data.login;

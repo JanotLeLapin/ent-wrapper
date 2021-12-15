@@ -178,9 +178,7 @@ export class Session {
         const json: any[] = await this.fetch(
           `zimbra/list?folder=${folder}&page=${page}&unread=false`
         );
-        resolve(
-          json.map((message) => new Message({ ...message, session: this }))
-        );
+        resolve(json.map((message) => new Message(message, this)));
       } catch (err) {
         reject(err);
       }
@@ -197,11 +195,13 @@ export class Session {
       try {
         const json = await this.fetch(`zimbra/message/${messageId}`);
         resolve(
-          new Message({
-            ...json,
-            body: json.body,
-            session: this,
-          })
+          new Message(
+            {
+              json,
+              body: json.body,
+            },
+            this
+          )
         );
       } catch (err) {
         reject(err);
@@ -263,9 +263,7 @@ export class Session {
           'POST'
         );
         resolve(
-          json.users.map(
-            (userpreview) => new UserPreview({ ...userpreview, session: this })
-          )
+          json.users.map((userpreview) => new UserPreview(userpreview, this))
         );
       } catch (err) {
         reject(err);
@@ -281,7 +279,7 @@ export class Session {
     return new Promise<User>(async (resolve, reject) => {
       try {
         const json = await this.fetch('userbook/api/person?id=' + userId);
-        resolve(new User({ ...json.result[0], session: this }));
+        resolve(new User(json.result[0], this));
       } catch (err) {
         reject(err);
       }

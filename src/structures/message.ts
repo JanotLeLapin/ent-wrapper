@@ -55,8 +55,8 @@ export class Message {
   unread: boolean;
   body?: string;
 
-  constructor(data: any) {
-    this.session = data.session;
+  constructor(data: any, session: Session) {
+    this.session = session;
 
     this.attachments = data.attachments;
     this.bcc = data.bcc;
