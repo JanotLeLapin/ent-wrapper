@@ -49,20 +49,3 @@ export const htmlToText = (html: string) =>
     .replace(/&#(\d+);/g, (_match, num) =>
       String.fromCharCode(parseInt(num, 10))
     );
-
-/**
- * Checks if a response contains an error and rejects it.
- * @param res The node fetch json response
- * @param reject The promise reject function
- */
-export const error = (res: any, reject: (reason: any) => void) => {
-  if (res.error) {
-    try {
-      reject(JSON.parse(res.error));
-    } catch {
-      reject(res.error);
-    }
-    return true;
-  }
-  return false;
-};

@@ -5,7 +5,7 @@ import { Message, IMessageConfig } from './message';
 import { User, UserPreview, profile } from './user';
 import { App } from './app';
 
-import { encodeUrl, error } from '../util';
+import { encodeUrl } from '../util';
 
 export interface IUserInfo {
   classNames: string[];
@@ -146,9 +146,7 @@ export class Session {
         });
 
         const json = await res.json();
-        if (error(json, reject))
-          return reject(new Error('Could not fetch data.'));
-
+        if (json.error) reject(new Error(json.error));
         resolve(json);
       } catch (err) {
         reject(err);
