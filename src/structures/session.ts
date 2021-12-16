@@ -73,11 +73,18 @@ export class Session {
   authCookie?: string;
   xsrf?: string;
   url?: string;
+  cache: {
+    apps: App[];
+  };
 
   constructor(url: string, private username: string, private password: string) {
     this.url =
       (url.startsWith('https://') ? url : 'https://' + url) +
       (url.endsWith('/') ? '' : '/');
+
+    this.cache = {
+      apps: [],
+    };
   }
 
   /** Fetches a session cookie from the API */
@@ -230,8 +237,12 @@ export class Session {
   fetchApps(): Promise<App[]> {
     return new Promise<App[]>(async (resolve, reject) => {
       try {
+        if (this.cache.apps.length) return resolve(this.cache.apps);
+
         const { apps }: { apps: any[] } = await this.fetch('applications-list');
-        resolve(apps.map((app) => new App(app, this)));
+        const data = apps.map((app) => new App(app, this));
+        this.cache.apps = data;
+        resolve(data);
       } catch (err) {
         reject(err);
       }
@@ -239,15 +250,44 @@ export class Session {
   }
 
   /** Fetches the user's pinned apps */
-  fetchPinnedApps(): Promise<string[]> {
-    return new Promise<string[]>(async (resolve, reject) => {
+  fetchPinnedApps(): Promise<App[]> {
+    return new Promise<App[]>(async (resolve, reject) => {
       try {
+        const apps = await this.fetchApps();
         const json = await this.fetch('userbook/preference/apps');
-        resolve(JSON.parse(json.preference).bookmarks);
+        const pinned: string[] = JSON.parse(json.preference).bookmarks;
+        resolve(
+          pinned
+            .map((app) => apps.find((a) => a.name == app))
+            .filter((app) => !!app) as App[]
+        );
       } catch (err) {
         reject(err);
       }
     });
+  }
+
+  /**
+   * Pins a specific array of applications
+   * @param pins The applications to pin
+   */
+  async pinApps(pins: App[]) {
+    const apps = (await this.fetchApps()).map((app) => app.name);
+    const pinned = pins.map((pin) => pin.name);
+
+    const bookmarks: string[] = [];
+    const applications: string[] = [];
+    for (let i = 0; i < apps.length; i++) {
+      (pinned.includes(apps[i]) ? bookmarks : applications).push(apps[i]);
+    }
+    await this.fetch(
+      'userbook/preference/apps',
+      JSON.stringify({
+        bookmarks,
+        applications,
+      }),
+      'PUT'
+    );
   }
 
   /**
@@ -322,6 +362,22 @@ export class Session {
           'POST'
         );
         resolve(sendJson.id);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  setMood(mood: string): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const info = await this.fetchUserInfo();
+        await this.fetch(
+          `directory/userbook/${info.userId}`,
+          JSON.stringify({ mood }),
+          'PUT'
+        );
+        resolve();
       } catch (err) {
         reject(err);
       }
