@@ -7,7 +7,7 @@ import { App } from './app';
 
 import { encodeUrl } from '../util';
 
-export interface IUserInfo {
+export type IUserInfo = {
   classNames: string[];
   level: string;
   login: string;
@@ -37,21 +37,21 @@ export interface IUserInfo {
   childrenIds: any[];
   children: IChildren;
   widgets: IWidget[];
-}
+};
 
-export interface IAuthorizedAction {
+export type IAuthorizedAction = {
   name: string;
   displayName: string;
   type: Type;
-}
+};
 
 export enum Type {
   SecuredActionWorkflow = 'SECURED_ACTION_WORKFLOW',
 }
 
-export interface IChildren {}
+export type IChildren = any;
 
-export interface IWidget {
+export type IWidget = {
   application: null | string;
   i18n: string;
   name: string;
@@ -59,15 +59,15 @@ export interface IWidget {
   mandatory: boolean;
   id: string;
   js: string;
-}
+};
 
-export interface IQuery {
+export type IQuery = {
   classes?: string[];
   functions?: string[];
   mood?: boolean;
   profiles?: profile[];
   search?: string;
-}
+};
 
 export class Session {
   authCookie?: string;

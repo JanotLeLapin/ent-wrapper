@@ -3,7 +3,7 @@ import { Session } from './session';
 export type target = '_blank' | '';
 export type scope = '' | 'myinfos' | 'userinfo';
 
-export interface IApp {
+export type IApp = {
   name: string;
   address: string;
   icon: string;
@@ -14,7 +14,7 @@ export interface IApp {
   casType?: string;
   scope: scope[];
   isExternal: boolean;
-}
+};
 
 export class App {
   session: Session;

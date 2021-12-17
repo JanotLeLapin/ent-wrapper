@@ -1,23 +1,23 @@
 import { Session } from './session';
 import { IMessageConfig } from './message';
 
-export interface IUserPreview {
+export type IUserPreview = {
   id: string;
   displayName: string;
   groupDisplayName: string;
   profile: profile;
-}
+};
 
-export interface IHobby {
+export type IHobby = {
   /** The visibility of the hobby */
   visibility: 'PUBLIC' | 'PRIVE';
   /** The category of the hobby */
   category: hobby;
   /** The user input on this hobby */
   values: string;
-}
+};
 
-export interface IUser {
+export type IUser = {
   id: string;
   login: string;
   displayName: string;
@@ -36,7 +36,7 @@ export interface IUser {
   mobile: string;
   birthdate: string;
   hobbies: IHobby[];
-}
+};
 
 export type profile =
   | 'Teacher'

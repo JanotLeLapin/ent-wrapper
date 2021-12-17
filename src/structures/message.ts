@@ -3,7 +3,7 @@ import { htmlToText } from '../util';
 import { Session } from './session';
 import { User } from './user';
 
-export interface IMessage {
+export type IMessage = {
   attachments: any[];
   bcc: any[];
   cc: any[];
@@ -21,9 +21,9 @@ export interface IMessage {
   to: string[];
   unread: boolean;
   body?: string;
-}
+};
 
-export interface IMessageConfig {
+export type IMessageConfig = {
   body: string;
   subject?: string;
   parseBody?: boolean;
@@ -32,7 +32,7 @@ export interface IMessageConfig {
   cc?: string[];
   bcc?: string;
   to?: string[];
-}
+};
 
 export class Message {
   session: Session;
