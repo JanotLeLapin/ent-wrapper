@@ -73,4 +73,37 @@ export class App {
       ? this.session.url + this.address.substring(1)
       : this.address;
   }
+
+  /** Adds this app to favorites */
+  async pin() {
+    const apps: { bookmarks: string[]; applications: string[] } = JSON.parse(
+      (await this.session.fetch('userbook/preference/apps')).preference
+    );
+    if (!apps.applications.includes(this.name)) return;
+
+    apps.applications.splice(apps.applications.indexOf(this.name), 1);
+    apps.bookmarks.push(this.name);
+    await this.session.fetch(
+      'userbook/preference/apps',
+      JSON.stringify(apps),
+      'PUT'
+    );
+  }
+
+  /** Removes this app from favorites */
+  async unpin() {
+    const apps: { bookmarks: string[]; applications: string[] } = JSON.parse(
+      (await this.session.fetch('userbook/preference/apps')).preference
+    );
+    if (!apps.bookmarks.includes(this.name)) return;
+
+    apps.applications.push(this.name);
+    apps.bookmarks.splice(apps.bookmarks.indexOf(this.name), 1);
+    console.log(apps);
+    await this.session.fetch(
+      'userbook/preference/apps',
+      JSON.stringify(apps),
+      'PUT'
+    );
+  }
 }

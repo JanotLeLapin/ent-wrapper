@@ -16,8 +16,15 @@
 Ent Wrapper is a promise based wrapper for the Ent api. It takes an object-oriented approach, which makes the code easier to read.  
 For now, Ent Wrapper has only been tested with the region iledefrance. If your region is not supported, feel free to add an issue.
 
+### Warning
+
+As the Ent api does not seem to perform any data validation, using methods which should modify data on the server (such as `App#pin`) might mess up your Ent if they decide to update their Api or if you pass in wrong arguments. Please be careful when using this library.
+
 ## Table of contents
 
+- [About](#about)
+  - [Warning](#warning)
+- [Table of contents](#table-of-contents)
 - [Example](#example)
 - [API](#api)
 
